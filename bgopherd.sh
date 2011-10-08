@@ -10,7 +10,7 @@
 
 
 # Find and load config.
-config=bgopherd.conf
+config=/etc/bgopherd.conf
 
 while getopts c: name; do
 	case $name in
