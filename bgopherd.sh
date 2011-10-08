@@ -100,5 +100,6 @@ if [[ "${absreq:0:${#docroot}}" == "$docroot" ]]; then
 		cat "$absreq"
 	fi
 else
-	echo "\`$request' invalid."
+	printf "%s%s\t%s\t%s\t%s\r\n" \
+		3 "\`$request' invalid." "Error" "Error" "0"
 fi
