@@ -42,12 +42,33 @@ parseIndex()
 		"$@"
 }
 
+isCGI()
+{
+	[[ -x "$1" ]] && [[ "${1##*.}" == "cgi" ]]
+}
+
+isDCGI()
+{
+	[[ -x "$1" ]] && [[ "${1##*.}" == "dcgi" ]]
+}
+
 sendListing()
 {
 	dirEmpty "$1" && return
 
 	for i in "$1"/*; do
 		[[ -d "$i" ]] && itype=1 || itype=0
+		isDCGI "$i" && itype=1
+
+		ext=${i##*.}
+		if [[ -n "$ext" ]]; then
+			case "${ext,,}" in
+				html|htm|xhtm|xhtml) itype=h ;;
+				jpeg|jpg|png|tif|tiff|bmp|svg) itype=I ;;
+				exe|bin|iso|img|gz|xz|tar|tgz) itype=9 ;;
+				gif) itype=g ;;
+			esac
+		fi
 
 		printf "%s%s\t%s\t%s\t%s\r\n" \
 			$itype \
@@ -69,9 +90,9 @@ if [[ "${absreq:0:${#docroot}}" == "$docroot" ]]; then
 		else
 			sendListing "$absreq"
 		fi
-	elif [[ -x "$absreq" ]] && [[ "${absreq##*.}" == "cgi" ]]; then
+	elif isCGI "$absreq"; then
 		"$absreq"
-	elif [[ -x "$absreq" ]] && [[ "${absreq##*.}" == "dcgi" ]]; then
+	elif isDCGI "$absreq"; then
 		"$absreq" | parseIndex
 	else
 		cat "$absreq"
