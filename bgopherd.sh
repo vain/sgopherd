@@ -85,6 +85,12 @@ sendListing()
 	done
 }
 
+run()
+(
+	cd -- "${1%/*}"
+	"$1"
+)
+
 # Process a request.
 read -r request
 request=${request//$'\r'/}
@@ -96,16 +102,16 @@ if [[ "${absreq:0:${#docroot}}" == "$docroot" ]]; then
 		if [[ -f "$absreq"/INDEX ]]; then
 			parseIndex "${absreq:${#docroot}}" "$absreq"/INDEX
 		elif isDCGI "$absreq"/INDEX.dcgi; then
-			"$absreq"/INDEX.dcgi | parseIndex "${absreq:${#docroot}}"
+			run "$absreq"/INDEX.dcgi | parseIndex "${absreq:${#docroot}}"
 		else
 			sendListing "$absreq"
 		fi
 	elif isCGI "$absreq"; then
-		"$absreq" "$search"
+		run "$absreq" "$search"
 	elif isDCGI "$absreq"; then
 		rel="${absreq:${#docroot}}"
 		rel="${rel%/*}"
-		"$absreq" "$search" | parseIndex "$rel"
+		run "$absreq" "$search" | parseIndex "$rel"
 	else
 		cat "$absreq"
 	fi
