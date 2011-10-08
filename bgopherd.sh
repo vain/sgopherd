@@ -72,7 +72,7 @@ sendListing()
 			esac
 		fi
 
-		printf "%s%s\t%s\t%s\t%s\r\n" \
+		printf "%s%s\t%s\t%s\t%d\r\n" \
 			$itype \
 			"${i##*/}" \
 			"${i:${#docroot}}" \
@@ -100,6 +100,6 @@ if [[ "${absreq:0:${#docroot}}" == "$docroot" ]]; then
 		cat "$absreq"
 	fi
 else
-	printf "%s%s\t%s\t%s\t%s\r\n" \
-		3 "\`$request' invalid." "Error" "Error" "0"
+	printf "%d%s\t%s\t%s\t%d\r\n" \
+		3 "\`$request' invalid." "Error" "Error" 0
 fi
