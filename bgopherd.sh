@@ -35,10 +35,14 @@ dirEmpty()
 
 parseIndex()
 {
+	rel=$1
+	shift
+
 	sed \
 		-e '/^\[/! { s/.*/i&\t-\t-\t0/ }' \
 		-e '/^\[/ { s/\$MYHOST/'"$servername"'/g }' \
 		-e '/^\[/ { s/\$MYPORT/'"$serverport"'/g }' \
+		-e '/^\[/ { s,^\(...[^|]\+|\)\([^/]\),\1'"$rel"'/\2, }' \
 		-e '/^\[/ { s/\[//; s/^\(.\)|/\1/; s/\]//; s/|/\t/g }' \
 		-e 's/$/\r/' \
 		"$@"
@@ -90,14 +94,16 @@ absreq=$(rel2abs "$docroot$selector")
 if [[ "${absreq:0:${#docroot}}" == "$docroot" ]]; then
 	if [[ -d "$absreq" ]]; then
 		if [[ -f "$absreq"/INDEX ]]; then
-			parseIndex "$absreq"/INDEX
+			parseIndex "${absreq:${#docroot}}" "$absreq"/INDEX
 		else
 			sendListing "$absreq"
 		fi
 	elif isCGI "$absreq"; then
 		"$absreq" "$search"
 	elif isDCGI "$absreq"; then
-		"$absreq" "$search" | parseIndex
+		rel="${absreq:${#docroot}}"
+		rel="${rel%/*}"
+		"$absreq" "$search" | parseIndex "$rel"
 	else
 		cat "$absreq"
 	fi
