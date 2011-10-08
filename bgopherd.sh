@@ -23,8 +23,8 @@ done
 # Library functions.
 rel2abs()
 {
-	[[ -d "$1" ]] && { (cd "$1"; echo "$PWD"); return; }
-	[[ -f "$1" ]] && { (cd "${1%/*}"; echo "$PWD/${1##*/}"); return; }
+	[[ -d "$1" ]] && { (cd -- "$1"; echo "$PWD"); return; }
+	[[ -f "$1" ]] && { (cd -- "${1%/*}"; echo "$PWD/${1##*/}"); return; }
 }
 
 dirEmpty()
