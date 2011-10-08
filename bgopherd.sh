@@ -37,6 +37,8 @@ parseIndex()
 {
 	sed \
 		-e '/^\[/! { s/.*/i&\t-\t-\t0/ }' \
+		-e '/^\[/ { s/\$MYHOST/'"$servername"'/g }' \
+		-e '/^\[/ { s/\$MYPORT/'"$serverport"'/g }' \
 		-e '/^\[/ { s/\[//; s/^\(.\)|/\1/; s/\]//; s/|/\t/g }' \
 		-e 's/$/\r/' \
 		"$@"
