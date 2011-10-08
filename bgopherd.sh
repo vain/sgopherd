@@ -95,6 +95,8 @@ if [[ "${absreq:0:${#docroot}}" == "$docroot" ]]; then
 	if [[ -d "$absreq" ]]; then
 		if [[ -f "$absreq"/INDEX ]]; then
 			parseIndex "${absreq:${#docroot}}" "$absreq"/INDEX
+		elif isDCGI "$absreq"/INDEX.dcgi; then
+			"$absreq"/INDEX.dcgi | parseIndex "${absreq:${#docroot}}"
 		else
 			sendListing "$absreq"
 		fi
