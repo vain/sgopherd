@@ -84,7 +84,9 @@ sendListing()
 # Process a request.
 read -r request
 request=${request//$'\r'/}
-absreq=$(rel2abs "$docroot$request")
+selector=${request%$'\t'*}
+search=${request#*$'\t'}
+absreq=$(rel2abs "$docroot$selector")
 if [[ "${absreq:0:${#docroot}}" == "$docroot" ]]; then
 	if [[ -d "$absreq" ]]; then
 		if [[ -f "$absreq"/INDEX ]]; then
@@ -93,9 +95,9 @@ if [[ "${absreq:0:${#docroot}}" == "$docroot" ]]; then
 			sendListing "$absreq"
 		fi
 	elif isCGI "$absreq"; then
-		"$absreq"
+		"$absreq" "$search"
 	elif isDCGI "$absreq"; then
-		"$absreq" | parseIndex
+		"$absreq" "$search" | parseIndex
 	else
 		cat "$absreq"
 	fi
