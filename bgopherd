@@ -49,7 +49,7 @@ parseIndex()
 	# (another gopher server). Lines beginning with a bracket denote a
 	# menu item, all other lines are informational text.
 	#
-	# Substitute $MYHOST and $MYPORT with the server's settings. Also
+	# Substitute "server" and "port" with the server's settings. Also
 	# turn relative paths into absolute ones: Paths that do not begin
 	# with a "/" are relative to $rel.
 	#
@@ -60,8 +60,8 @@ parseIndex()
 
 	sed \
 		-e '/^\[/! { s/.*/i&\t-\t-\t0/ }' \
-		-e '/^\[/ { s/\$MYHOST/'"$servername"'/g }' \
-		-e '/^\[/ { s/\$MYPORT/'"$serverport"'/g }' \
+		-e '/^\[/ { s/\(.*\)|server|\([^|]\+\)]/\1|'"$servername"'|\2]/ }' \
+		-e '/^\[/ { s/\(.*\)|\([^|]\+\)|port]/\1|\2|'"$serverport"']/ }' \
 		-e '/^\[/ { s,^\(...[^|]\+|\)\([^/]\),\1'"$rel"'/\2, }' \
 		-e '/^\[/ { s/\[//; s/^\(.\)|/\1/; s/\]//; s/|/\t/g }' \
 		-e 's/$/\r/' \
