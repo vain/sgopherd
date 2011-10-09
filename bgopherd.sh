@@ -88,7 +88,7 @@ sendListing()
 run()
 (
 	cd -- "${1%/*}"
-	"$1"
+	"$@"
 )
 
 # Process a request.
