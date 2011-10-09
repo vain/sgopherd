@@ -169,13 +169,13 @@ if [[ "${absreq:0:${#docroot}}" == "$docroot" ]]; then
 			sendListing "$absreq"
 		fi
 	elif isCGI "$absreq"; then
-		run "$absreq" "$search"
+		echo "$search" | run "$absreq"
 	elif isDCGI "$absreq"; then
 		# If a DCGI script outputs a relative path, then this path is
 		# meant to be relative to the scripts location.
 		rel="${absreq:${#docroot}}"
 		rel="${rel%/*}"
-		run "$absreq" "$search" | parseIndex "$rel"
+		echo "$search" | run "$absreq" | parseIndex "$rel"
 	else
 		# This is a regular file. Just show it.
 		cat "$absreq"
