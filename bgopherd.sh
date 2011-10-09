@@ -64,7 +64,14 @@ sendListing()
 
 	for i in "$1"/*; do
 		[[ -d "$i" ]] && itype=1 || itype=0
-		isDCGI "$i" && itype=1
+		if isDCGI "$i"; then
+			itype=1
+			bname=${i##*/}
+			bname=${bname,,}
+			if [[ "${bname:0:6}" == "query_" ]]; then
+				itype=7
+			fi
+		fi
 
 		ext=${i##*.}
 		if [[ -n "$ext" ]]; then
