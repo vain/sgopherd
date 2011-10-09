@@ -148,7 +148,7 @@ run()
 read -r request
 request=${request//$'\r'/}
 selector=${request%$'\t'*}
-search=${request#*$'\t'}
+search=${request:${#selector}}
 
 # Prefix the selector with the path of the document root. Then convert
 # this path into an absolute one. If the result is still a path below
