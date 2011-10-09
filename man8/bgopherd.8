@@ -1,0 +1,171 @@
+.TH BGOPHERD 8  "October 2011" "bgopherd" "Bash Gopher Daemon"
+.SH NAME
+bgopherd \- A gopher server written in
+.BR bash (1).
+.SH SYNOPSIS
+\fBbgopherd\fP [\fB\-c\fP \fIconfig\fP]
+.SH DESCRIPTION
+\fBbgopherd\fP is a simple gopher server for Unix-like systems. As it's
+implemented as a shell script (GNU Bash), there's no standalone daemon
+functionality. Thus, it's meant to be called by \fBinetd\fP(8) or
+\fBxinetd\fP(8). Despite being tiny, \fBbgopherd\fP supports
+.IP \(bu 4
+dynamic content using CGI scripts and dynamic menus using DCGI scripts,
+.IP \(bu 4
+automatic indexing,
+.IP \(bu 4
+automatic dynamic menu creation using \fIINDEX.dcgi\fP scripts,
+.IP \(bu 4
+manual menus using plain text \fIINDEX\fP files,
+.IP \(bu 4
+search queries and
+.IP \(bu 4
+basic file type detection.
+.SH OPTIONS
+By default, \fBbgopherd\fP will use \fI/etc/bgopherd.conf\fP as the
+configuration file. This can be overridden by using the \fB\-c\fP
+option.
+.SH CONFIGURATION
+The configuration file itself is a shell script which will be sourced
+when \fBbgopherd\fP is started. You are supposed to define three
+variables:
+.TP
+\fBdocroot\fP
+The document root. No files outside of this directory can be served.
+However, it's possible to create symlinks in this directory which point
+to an arbitrary location.
+.TP
+\fBservername\fP
+The server's hostname. This string will be used in menu items. This
+variable does \fBNOT\fP control on which network interfaces the server
+can be accessed. In fact, \fBbgopherd\fP knows nothing about networking;
+all of that must be configured in (x)inetd.
+.TP
+\fBserverport\fP
+The server's port. Again, this is only relevant for menu items.
+.P
+No default values are defined for those settings, so they \fBmust\fP be
+specified.
+.P
+All in all, the file could look like this:
+.P
+\f(CW
+.nf
+	docroot=/srv/gopher
+	servername=localhost
+	serverport=70
+.fi
+\fP
+.P
+As the configuration file is a shell script, it can contain code. This
+could be considered a security issue and may change in the future.
+.P
+Have a look at your (x)inetd documentation to learn how to configure it.
+As an example, the following could be used to integrate \fBbgopherd\fP
+into xinetd:
+.P
+\f(CW
+.nf
+	service gopher
+	{
+		socket_type     = stream
+		wait            = no
+		user            = www-data
+		server          = /usr/bin/bgopherd
+		server_args     = -c /etc/bgopherd.conf
+		disable         = no
+	}
+.fi
+\fP
+.SH "INDEX FILE FORMAT"
+The gopher protocol is trivial in technical terms but it's cumbersome to
+write gopher menus by hand. Hence, the following file format simplifies
+this process. It's pretty similar to the format of \fIindex.gph\fP files
+in \fBgeomyidae\fP(8), another gopher server.
+.P
+An index file may contain arbitrary text which is translated into an
+\(lqinformational text\(rq item in the gopher menu. On the other hand, a
+line beginning with an opening bracket will be interpreted by
+\fBbgopherd\fP and will create a menu item. It has the following
+structure:
+.IP
+\fB[\fP\fI<type>\fP\fB|\fP\fI<desc>\fP\fB|\fP\fI<path>\fP\fB|\fP\fI<host>\fP\fB|\fP\fI<port>\fP\fB]\fP
+.P
+Where:
+.IP \(bu 4
+\fI<type>\fP is a valid gopher item type (see \fIRFC 1436\fP).
+.IP \(bu 4
+\fI<desc>\fP is the description of the item.
+.IP \(bu 4
+\fI<path>\fP is an absolute or relative path to the gopher item.
+Relative paths are meant to be relative to the current directory and
+should only point to a location on the current host.
+.IP \(bu 4
+\fI<host>\fP is the target host. If this is set to \(lqserver\(rq, then
+the server's hostname is used (see configuration item \fBservername\fP).
+.IP \(bu 4
+\fI<port>\fP is the port of the target host. If this is set to
+\(lqport\(rq, then the local server's port is used (see configuration
+item \fBserverport\fP).
+.P
+Thus, an index file could read as follows:
+.P
+\f(CW
+.nf
+	Welcome!
+
+	Have fun browsing this server.
+
+	[0|About this server|about.txt|server|port]
+	[0|A quote|/random/quote.txt|server|port]
+	[1|Pics|/pics|server|port]
+	[1|My friend's server|foo.friend.org|70]
+.fi
+\fP
+.P
+The index file format will be used under several circumstances, see
+below.
+.SH INDEXING
+If a directory is requested by the client, \fBbgopherd\fP will
+.IP \(bu 4
+read and parse the special file \fIINDEX\fP if it exists, or otherwise
+.IP \(bu 4
+execute the DCGI script (see below) \fIINDEX.dcgi\fP (if it exists) and
+parse its output according to the index file format, or otherwise
+.IP \(bu 4
+create a simple menu containing all non-hidden files in the directory.
+Files and directories beginning with a dot are considered hidden.
+.SH "DYNAMIC CONTENT"
+.SS CGI scripts
+Every executable file is treated as a CGI script if the file name ends
+in \(lq.cgi\(rq. If such a file is requested, it is executed and the
+output on \fBstdout\fP is sent to the client. If a search string was
+supplied, then this string is written to the script's \fBstdin\fP. The
+script's working directory is the same as its location.
+.P
+Note: There are no environment variables provided to the script, yet.
+.SS DCGI scripts
+Pretty much the same as CGI scripts but the file name must end with
+\(lq.dcgi\(rq. Furthermore, the script's output will be interpreted
+according to the index file format. This mechanism allows you to
+dynamically create gopher menus.
+.SS Notes on Security
+Please note that (D)CGI scripts are run as the same user as
+\fBbgopherd\fP itself. Also, there are no special security mechanisms in
+effect. That is, if the \fBbgopherd\fP-user has the rights to erase your
+hard drive, then every (D)CGI script can do the same!
+.P
+As (D)CGI scripts can receive user input that may be malicious, you have
+to be very careful.
+.SH FILES
+.TP
+\fI/etc/bgopherd.conf\fP
+Default config file for \fBbgopherd\fP.
+.SH "SEE ALSO"
+.BR bash (1),
+.BR inetd (8),
+.BR xinetd (8),
+.BR geomyidae (8),
+RFC 1436.
+.SH HISTORY
+2011 \(en Originally written by Peter Hofmann (pcode@uninformativ.de).
