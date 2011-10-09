@@ -63,24 +63,28 @@ sendListing()
 	dirEmpty "$1" && return
 
 	for i in "$1"/*; do
-		[[ -d "$i" ]] && itype=1 || itype=0
-		if isDCGI "$i"; then
+		if [[ -d "$i" ]]; then
 			itype=1
-			bname=${i##*/}
-			bname=${bname,,}
-			if [[ "${bname:0:6}" == "query_" ]]; then
-				itype=7
+		else
+			itype=0
+			if isDCGI "$i"; then
+				itype=1
+				bname=${i##*/}
+				bname=${bname,,}
+				if [[ "${bname:0:6}" == "query_" ]]; then
+					itype=7
+				fi
+			else
+				ext=${i##*.}
+				if [[ -n "$ext" ]]; then
+					case "${ext,,}" in
+						html|htm|xhtm|xhtml) itype=h ;;
+						jpeg|jpg|png|tif|tiff|bmp|svg) itype=I ;;
+						exe|bin|iso|img|gz|xz|tar|tgz) itype=9 ;;
+						gif) itype=g ;;
+					esac
+				fi
 			fi
-		fi
-
-		ext=${i##*.}
-		if [[ -n "$ext" ]]; then
-			case "${ext,,}" in
-				html|htm|xhtm|xhtml) itype=h ;;
-				jpeg|jpg|png|tif|tiff|bmp|svg) itype=I ;;
-				exe|bin|iso|img|gz|xz|tar|tgz) itype=9 ;;
-				gif) itype=g ;;
-			esac
 		fi
 
 		printf "%s%s\t%s\t%s\t%d\r\n" \
