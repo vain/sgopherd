@@ -152,6 +152,30 @@ hard drive, then every (D)CGI script can do the same!
 .P
 As (D)CGI scripts can receive user input that may be malicious, you have
 to be very careful.
+.SH LOGGING
+\fBbgopherd\fP will log to syslog using \fBlogger\fP(1). It'll use
+\fBLOG_DAEMON\fP as \fIfacility\fP, so all messages should show up in
+your \fI/var/log/daemon.log\fP or similar. Regular messages are of
+\fIlevel\fP \fBLOG_INFO\fP, error conditions are \fBLOG_ERR\fP.
+.P
+Each line shows up as follows:
+.IP
+\fBbgopherd[\fP\fI<pid>\fP\fB]: '\fP\fI<host>\fP\fB' '\fP\fI<type>\fP\fB' '\fP\fI<selector>\fP\fB'\fP
+.P
+Where:
+.IP \(bu 4
+\fI<pid>\fP is the process ID of shell script invoked by (x)inetd.
+.IP \(bu 4
+\fI<host>\fP is the IP of the remote host. (x)inetd is expected to fill
+the environment variable $\fBREMOTE_HOST\fP when launching
+\fBbgopherd\fP.
+.IP \(bu 4
+\fI<type>\fP shows the type of the served ressource, such as
+\fBINDEX\fP, \fBINDEX.dcgi\fP, \fBAUTOINDEX\fP, \fBCGI\fP, \fBDCGI\fP or
+\fBFILE\fP. If the request was invalid or the file could not be found,
+then \fBINVALID\fP will show up in your logfile.
+.IP \(bu 4
+\fI<selector>\fP is the full request sent by the client.
 .SH FILES
 .TP
 .PD 0
@@ -160,6 +184,10 @@ to be very careful.
 \fI/etc/xinetd.d/bgopherd\fP
 \fBinetd\fP(8) or \fBxinetd\fP(8) config file for \fBbgopherd\fP.
 .PD
+.TP
+\fI/var/log/daemon.log\fP
+\fBbgopherd\fP's log messages sent to syslog should end up this file.
+May be different on your system.
 .SH TODO
 Currently, \fBbgopherd\fP requires GNU \fBbash\fP(1) and GNU
 \fBsed\fP(1). This means that it won't run on non-GNU systems such as
@@ -178,6 +206,8 @@ require this dot.
 .BR sed (1),
 .BR inetd (8),
 .BR xinetd (8),
+.BR logger (1),
+.BR syslog (3),
 .BR geomyidae (8),
 RFC 1436.
 .SH HISTORY
