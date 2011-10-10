@@ -1,0 +1,52 @@
+# Maintainer: Vain
+pkgname=bgopherd-git
+pkgver=20111010
+pkgrel=1
+pkgdesc="A gopher server written in Bash"
+arch=(any)
+url="gopher://uninformativ.de/1/bgopherd/"
+license=('GPL')
+groups=()
+depends=('xinetd')
+makedepends=('git')
+provides=()
+conflicts=()
+replaces=()
+backup=('etc/bgopherd.conf' 'etc/xinetd.d/bgopherd')
+options=()
+install=
+source=()
+noextract=()
+md5sums=() #generate with 'makepkg -g'
+
+# TODO: Replace with URL at GitHub
+_gitroot=~/work/shell/bgopherd
+_gitname="master"
+
+build() {
+  cd "$srcdir"
+  msg "Connecting to GIT server...."
+
+  if [[ -d "$_gitname" ]]; then
+    cd "$_gitname" && git pull origin
+    msg "The local files are updated."
+  else
+    git clone "$_gitroot" "$_gitname"
+  fi
+
+  msg "GIT checkout done or server timeout"
+  msg "Starting build..."
+
+  rm -rf "$srcdir/$_gitname-build"
+  git clone "$srcdir/$_gitname" "$srcdir/$_gitname-build"
+  cd "$srcdir/$_gitname-build"
+}
+
+package() {
+  cd "$srcdir/$_gitname-build"
+  install -Dm755 bgopherd $pkgdir/usr/bin/bgopherd
+  install -Dm644 bgopherd.conf $pkgdir/etc/bgopherd.conf
+  install -Dm644 xinetd-example.conf $pkgdir/etc/xinetd.d/bgopherd
+}
+
+# vim:set ts=2 sw=2 et:
