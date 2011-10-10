@@ -34,9 +34,9 @@ when \fBbgopherd\fP is started. You are supposed to define three
 variables:
 .TP
 \fBdocroot\fP
-The document root. No files outside of this directory can be served.
-However, it's possible to create symlinks in this directory which point
-to an arbitrary location.
+The document root. This path \fBMUST NOT\fP end with a slash. No files
+outside of this directory can be served.  However, it's possible to
+create symlinks in this directory which point to an arbitrary location.
 .TP
 \fBservername\fP
 The server's hostname. This string will be used in menu items. This
