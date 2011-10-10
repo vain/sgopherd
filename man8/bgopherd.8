@@ -155,6 +155,7 @@ to be very careful.
 .TP
 \fI/etc/xinetd.d/bgopherd\fP
 \fBinetd\fP(8) or \fBxinetd\fP(8) config file for \fBbgopherd\fP.
+.PD
 .SH TODO
 Currently, \fBbgopherd\fP requires GNU \fBbash\fP(1) and GNU
 \fBsed\fP(1). This means that it won't run on non-GNU systems such as
@@ -162,6 +163,12 @@ the BSD family \(en unless you install those GNU programs.  Porting
 \fBbgopherd\fP to POSIX \fBsh\fP(1p) will most likely result in a
 complete rewrite. Porting it to POSIX \fBsed\fP(1p), however, should not
 be that hard.
+.P
+The RFC requires that, in some circumstances, a line containing only one
+single dot is sent. For example, gopher menus must end with such a line.
+\fBbgopherd\fP does not send this extra dot. Most other servers I found
+don't do this, either. Nowadays, clients are intelligent enough not to
+require this dot.
 .SH "SEE ALSO"
 .BR bash (1),
 .BR sed (1),
