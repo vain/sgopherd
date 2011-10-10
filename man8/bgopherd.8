@@ -3,7 +3,10 @@
 bgopherd \- A gopher server written in
 .BR bash (1).
 .SH SYNOPSIS
-\fBbgopherd\fP [\fB\-c\fP \fIconfig\fP]
+\fBbgopherd\fP
+[\fB\-n\fP \fIname\fP]
+[\fB\-p\fP \fIport\fP]
+[\fB\-r\fP \fIdocroot\fP]
 .SH DESCRIPTION
 \fBbgopherd\fP is a simple gopher server for Unix-like systems,
 preferably GNU. As it's implemented as a shell script (GNU Bash),
@@ -25,47 +28,29 @@ basic file type detection.
 .P
 Internally, \fBbgopherd\fP uses GNU \fBsed\fP(1).
 .SH OPTIONS
-By default, \fBbgopherd\fP will use \fI/etc/bgopherd.conf\fP as the
-configuration file. This can be overridden by using the \fB\-c\fP
-option.
-.SH CONFIGURATION
-The configuration file itself is a shell script which will be sourced
-when \fBbgopherd\fP is started. You are supposed to define three
-variables:
 .TP
-\fBdocroot\fP
-The document root. This path \fBMUST NOT\fP end with a slash. No files
-outside of this directory can be served.  However, it's possible to
-create symlinks in this directory which point to an arbitrary location.
-.TP
-\fBservername\fP
+\fB\-n\fP \fIname\fP
 The server's hostname. This string will be used in menu items. This
 variable does \fBNOT\fP control on which network interfaces the server
 can be accessed. In fact, \fBbgopherd\fP knows nothing about networking;
-all of that must be configured in (x)inetd.
+all of that must be configured in (x)inetd. (Default: \(lqlocalhost\(rq)
 .TP
-\fBserverport\fP
+\fB\-p\fP \fIport\fP
 The server's port. Again, this is only relevant for menu items.
-.P
-No default values are defined for those settings, so they \fBmust\fP be
-specified.
-.P
-All in all, the file could look like this:
-.P
-\f(CW
-.nf
-	docroot=/srv/gopher
-	servername=localhost
-	serverport=70
-.fi
-\fP
-.P
-As the configuration file is a shell script, it can contain code. This
-could be considered a security issue and may change in the future.
-.P
-Have a look at your (x)inetd documentation to learn how to configure it.
-As an example, the following could be used to integrate \fBbgopherd\fP
-into xinetd:
+(Default: \(lq70\(rq)
+.TP
+\fB\-r\fP \fIdocroot\fP
+The document root. This path \fBMUST NOT\fP end with a slash. No files
+outside of this directory can be served. However, it's possible to
+create symlinks in this directory which point to an arbitrary location.
+(Default: \(lq/srv/gopher\(rq)
+.SH CONFIGURATION
+There is no special configuration file for \fBbgopherd\fP. Everything is
+configured using the command line arguments. \fBinetd\fP(8) or
+\fBxinetd\fP(8), on the other hand, must be configured. Have a look at
+your (x)inetd documentation to learn how to do this. As an example, the
+following could be used to integrate \fBbgopherd\fP into
+\fBxinetd\fP(8):
 .P
 \f(CW
 .nf
@@ -75,11 +60,14 @@ into xinetd:
 		wait            = no
 		user            = www-data
 		server          = /usr/bin/bgopherd
-		server_args     = -c /etc/bgopherd.conf
+		server_args     = -n myhostname -r /srv/gopher
 		disable         = no
 	}
 .fi
 \fP
+.P
+If (x)inetd is running and a client connects at port 70 (the default
+port for the gopher service), then \fBbgopherd\fP will be executed.
 .SH "INDEX FILE FORMAT"
 The gopher protocol is trivial in technical terms but it's cumbersome to
 write gopher menus by hand. Hence, the following file format simplifies
@@ -162,8 +150,11 @@ As (D)CGI scripts can receive user input that may be malicious, you have
 to be very careful.
 .SH FILES
 .TP
-\fI/etc/bgopherd.conf\fP
-Default config file for \fBbgopherd\fP.
+.PD 0
+\fI/etc/inetd.conf\fP
+.TP
+\fI/etc/xinetd.d/bgopherd\fP
+\fBinetd\fP(8) or \fBxinetd\fP(8) config file for \fBbgopherd\fP.
 .SH TODO
 Currently, \fBbgopherd\fP requires GNU \fBbash\fP(1) and GNU
 \fBsed\fP(1). This means that it won't run on non-GNU systems such as

@@ -9,16 +9,18 @@
 # ------------------------------------------------------------------
 
 
-# --- Find and load config.
-config=/etc/bgopherd.conf
+# --- Configure server.
+servername="localhost"
+serverport="70"
+docroot=/srv/gopher
 
-while getopts c: name; do
+while getopts n:p:r: name; do
 	case $name in
-		c) config="$OPTARG" ;;
+		n) servername="$OPTARG" ;;
+		p) serverport="$OPTARG" ;;
+		r) docroot="$OPTARG" ;;
 	esac
 done
-
-. "$config" || { echo "Unable to load config file." >&2; exit 1; }
 
 # --- Library functions.
 rel2abs()
