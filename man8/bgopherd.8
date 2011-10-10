@@ -5,10 +5,11 @@ bgopherd \- A gopher server written in
 .SH SYNOPSIS
 \fBbgopherd\fP [\fB\-c\fP \fIconfig\fP]
 .SH DESCRIPTION
-\fBbgopherd\fP is a simple gopher server for Unix-like systems. As it's
-implemented as a shell script (GNU Bash), there's no standalone daemon
-functionality. Thus, it's meant to be called by \fBinetd\fP(8) or
-\fBxinetd\fP(8). Despite being tiny, \fBbgopherd\fP supports
+\fBbgopherd\fP is a simple gopher server for Unix-like systems,
+preferably GNU. As it's implemented as a shell script (GNU Bash),
+there's no standalone daemon functionality. Thus, it's meant to be
+called by \fBinetd\fP(8) or \fBxinetd\fP(8). Despite being tiny,
+\fBbgopherd\fP supports
 .IP \(bu 4
 dynamic content using CGI scripts and dynamic menus using DCGI scripts,
 .IP \(bu 4
@@ -21,6 +22,8 @@ manual menus using plain text \fIINDEX\fP files,
 search queries and
 .IP \(bu 4
 basic file type detection.
+.P
+Internally, \fBbgopherd\fP uses GNU \fBsed\fP(1).
 .SH OPTIONS
 By default, \fBbgopherd\fP will use \fI/etc/bgopherd.conf\fP as the
 configuration file. This can be overridden by using the \fB\-c\fP
@@ -161,8 +164,16 @@ to be very careful.
 .TP
 \fI/etc/bgopherd.conf\fP
 Default config file for \fBbgopherd\fP.
+.SH TODO
+Currently, \fBbgopherd\fP requires GNU \fBbash\fP(1) and GNU
+\fBsed\fP(1). This means that it won't run on non-GNU systems such as
+the BSD family \(en unless you install those GNU programs.  Porting
+\fBbgopherd\fP to POSIX \fBsh\fP(1p) will most likely result in a
+complete rewrite. Porting it to POSIX \fBsed\fP(1p), however, should not
+be that hard.
 .SH "SEE ALSO"
 .BR bash (1),
+.BR sed (1),
 .BR inetd (8),
 .BR xinetd (8),
 .BR geomyidae (8),
