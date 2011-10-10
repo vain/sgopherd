@@ -46,6 +46,7 @@ package() {
   cd "$srcdir/$_gitname-build"
   install -Dm755 bgopherd $pkgdir/usr/bin/bgopherd
   install -Dm644 xinetd-example.conf $pkgdir/etc/xinetd.d/bgopherd
+  install -Dm644 man8/bgopherd.8 $pkgdir/usr/share/man/man8/bgopherd.8
 }
 
 # vim:set ts=2 sw=2 et:
