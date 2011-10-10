@@ -53,7 +53,8 @@ parseIndex()
 	#
 	# Substitute "server" and "port" with the server's settings. Also
 	# turn relative paths into absolute ones: Paths that do not begin
-	# with a "/" are relative to $rel.
+	# with a "/" are relative to $rel. However, if it begins with "!",
+	# remove that "!" and leave the path as is.
 	#
 	# Read from STDIN if $@ is empty.
 
@@ -64,7 +65,8 @@ parseIndex()
 		-e '/^\[/! { s/.*/i&\t-\t-\t0/ }' \
 		-e '/^\[/ { s/\(.*\)|server|\([^|]\+\)]/\1|'"$servername"'|\2]/ }' \
 		-e '/^\[/ { s/\(.*\)|\([^|]\+\)|port]/\1|\2|'"$serverport"']/ }' \
-		-e '/^\[/ { s,^\(...[^|]\+|\)\([^/]\),\1'"$rel"'/\2, }' \
+		-e '/^\[/ { s,^\(...[^|]\+|\)\([^/!]\),\1'"$rel"'/\2, }' \
+		-e '/^\[/ { s,^\(...[^|]\+|\)!\([^|]\+\),\1\2, }' \
 		-e '/^\[/ { s/\[//; s/^\(.\)|/\1/; s/\]//; s/|/\t/g }' \
 		-e 's/$/\r/' \
 		"$@"

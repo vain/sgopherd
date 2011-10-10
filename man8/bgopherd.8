@@ -90,7 +90,10 @@ Where:
 .IP \(bu 4
 \fI<path>\fP is an absolute or relative path to the gopher item.
 Relative paths are meant to be relative to the current directory and
-should only point to a location on the current host.
+should only point to a location on the current host. Note: When using
+gopher\+ \(lqURL links\(rq you must place an exclamation mark in front
+of \fI<path>\fP. To be more precise, an exclamation mark disables
+automatic prefixing for relativ paths.
 .IP \(bu 4
 \fI<host>\fP is the target host. If this is set to \(lqserver\(rq, then
 the server's hostname is used (see configuration item \fBservername\fP).
@@ -111,6 +114,7 @@ Thus, an index file could read as follows:
 	[0|A quote|/random/quote.txt|server|port]
 	[1|Pics|/pics|server|port]
 	[1|My friend's server|foo.friend.org|70]
+	[h|Funny prank|!URL:http://www.microsoft.com|server|port]
 .fi
 \fP
 .P
