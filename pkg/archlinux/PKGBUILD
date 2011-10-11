@@ -1,6 +1,6 @@
 # Maintainer: Vain
 pkgname=bgopherd-git
-pkgver=20111010
+pkgver=20111011
 pkgrel=1
 pkgdesc="A gopher server written in Bash"
 arch=(any)
