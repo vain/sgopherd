@@ -135,7 +135,10 @@ execute the DCGI script (see below) \fIINDEX.dcgi\fP (if it exists) and
 parse its output according to the index file format, or otherwise
 .IP \(bu 4
 create a simple menu containing all non-hidden files in the directory.
-Files and directories beginning with a dot are considered hidden.
+Files and directories beginning with a dot are considered hidden. If a
+file called \fIHEADER\fP exists in the directory, then this file will be
+parsed according to the index file format and it will be shown on top of
+the menu. \fIHEADER\fP files are not shown in the menu itself.
 .SH "DYNAMIC CONTENT"
 .SS CGI scripts
 Every executable file is treated as a CGI script if the file name ends

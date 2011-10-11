@@ -72,11 +72,19 @@ isScript()
 
 sendListing()
 {
+	if [[ -f "$1"/HEADER ]]; then
+		parseIndex "${1:${#docroot}}" "$1"/HEADER
+		printf 'i\t-\t-\t0\r\n'
+	fi
+
 	# Auto-create a menu, try to guess file types.
 	for i in "$1"/*; do
 		# Skip non-existing files, including empty directories (in this
 		# case, "$1"/* will expand to "$1"/* which does not exist).
 		[[ -e "$i" ]] || continue
+
+		# Skip HEADER files.
+		[[ "${i##*/}" == "HEADER" ]] && continue
 
 		if [[ -d "$i" ]]; then
 			itype=1
