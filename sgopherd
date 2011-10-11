@@ -130,11 +130,12 @@ run()
 
 # --- Process a request.
 # Read a line from STDIN. First, remove any CRs and extract selector and
-# search query (if any).
+# search query (if any). Discard anything after a second TAB.
 read -r request
 request=${request//$'\r'/}
-selector=${request%$'\t'*}
-search=${request:${#selector}}
+selector=${request%%$'\t'*}
+search=${request:${#selector}+1}
+search=${search%%$'\t'*}
 
 # Prefix the selector with the path of the document root. Then convert
 # this path into an absolute one. If the result is still a path below
