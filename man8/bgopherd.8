@@ -1,18 +1,18 @@
-.TH BGOPHERD 8  "October 2011" "bgopherd" "Bash Gopher Daemon"
+.TH BGOPHERD 8  "October 2011" "sgopherd" "Bash Gopher Daemon"
 .SH NAME
-bgopherd \- A gopher server written in
+sgopherd \- A gopher server written in
 .BR bash (1).
 .SH SYNOPSIS
-\fBbgopherd\fP
+\fBsgopherd\fP
 [\fB\-n\fP \fIname\fP]
 [\fB\-p\fP \fIport\fP]
 [\fB\-r\fP \fIdocroot\fP]
 .SH DESCRIPTION
-\fBbgopherd\fP is a simple gopher server for Unix-like systems,
+\fBsgopherd\fP is a simple gopher server for Unix-like systems,
 preferably GNU. As it's implemented as a shell script (GNU Bash),
 there's no standalone daemon functionality. Thus, it's meant to be
 called by \fBinetd\fP(8) or \fBxinetd\fP(8). Despite being tiny,
-\fBbgopherd\fP supports
+\fBsgopherd\fP supports
 .IP \(bu 4
 dynamic content using CGI scripts and dynamic menus using DCGI scripts,
 .IP \(bu 4
@@ -26,13 +26,13 @@ search queries and
 .IP \(bu 4
 basic file type detection.
 .P
-Internally, \fBbgopherd\fP uses GNU \fBsed\fP(1).
+Internally, \fBsgopherd\fP uses GNU \fBsed\fP(1).
 .SH OPTIONS
 .TP
 \fB\-n\fP \fIname\fP
 The server's hostname. This string will be used in menu items. This
 variable does \fBNOT\fP control on which network interfaces the server
-can be accessed. In fact, \fBbgopherd\fP knows nothing about networking;
+can be accessed. In fact, \fBsgopherd\fP knows nothing about networking;
 all of that must be configured in (x)inetd. (Default: \(lqlocalhost\(rq)
 .TP
 \fB\-p\fP \fIport\fP
@@ -45,11 +45,11 @@ outside of this directory can be served. However, it's possible to
 create symlinks in this directory which point to an arbitrary location.
 (Default: \(lq/srv/gopher\(rq)
 .SH CONFIGURATION
-There is no special configuration file for \fBbgopherd\fP. Everything is
+There is no special configuration file for \fBsgopherd\fP. Everything is
 configured using the command line arguments. \fBinetd\fP(8) or
 \fBxinetd\fP(8), on the other hand, must be configured. Have a look at
 your (x)inetd documentation to learn how to do this. As an example, the
-following could be used to integrate \fBbgopherd\fP into
+following could be used to integrate \fBsgopherd\fP into
 \fBxinetd\fP(8):
 .P
 \f(CW
@@ -59,7 +59,7 @@ following could be used to integrate \fBbgopherd\fP into
 		socket_type     = stream
 		wait            = no
 		user            = www-data
-		server          = /usr/bin/bgopherd
+		server          = /usr/bin/sgopherd
 		server_args     = -n myhostname -r /srv/gopher
 		disable         = no
 	}
@@ -67,7 +67,7 @@ following could be used to integrate \fBbgopherd\fP into
 \fP
 .P
 If (x)inetd is running and a client connects at port 70 (the default
-port for the gopher service), then \fBbgopherd\fP will be executed.
+port for the gopher service), then \fBsgopherd\fP will be executed.
 .SH "INDEX FILE FORMAT"
 The gopher protocol is trivial in technical terms but it's cumbersome to
 write gopher menus by hand. Hence, the following file format simplifies
@@ -77,7 +77,7 @@ in \fBgeomyidae\fP(8), another gopher server.
 An index file may contain arbitrary text which is translated into an
 \(lqinformational text\(rq item in the gopher menu. On the other hand, a
 line beginning with an opening bracket will be interpreted by
-\fBbgopherd\fP and will create a menu item. It has the following
+\fBsgopherd\fP and will create a menu item. It has the following
 structure:
 .IP
 \fB[\fP\fI<type>\fP\fB|\fP\fI<desc>\fP\fB|\fP\fI<path>\fP\fB|\fP\fI<host>\fP\fB|\fP\fI<port>\fP\fB]\fP
@@ -121,7 +121,7 @@ Thus, an index file could read as follows:
 The index file format will be used under several circumstances, see
 below.
 .SH INDEXING
-If a directory is requested by the client, \fBbgopherd\fP will
+If a directory is requested by the client, \fBsgopherd\fP will
 .IP \(bu 4
 read and parse the special file \fIINDEX\fP if it exists, or otherwise
 .IP \(bu 4
@@ -146,21 +146,21 @@ according to the index file format. This mechanism allows you to
 dynamically create gopher menus.
 .SS Notes on Security
 Please note that (D)CGI scripts are run as the same user as
-\fBbgopherd\fP itself. Also, there are no special security mechanisms in
-effect. That is, if the \fBbgopherd\fP-user has the rights to erase your
+\fBsgopherd\fP itself. Also, there are no special security mechanisms in
+effect. That is, if the \fBsgopherd\fP-user has the rights to erase your
 hard drive, then every (D)CGI script can do the same!
 .P
 As (D)CGI scripts can receive user input that may be malicious, you have
 to be very careful.
 .SH LOGGING
-\fBbgopherd\fP will log to syslog using \fBlogger\fP(1). It'll use
+\fBsgopherd\fP will log to syslog using \fBlogger\fP(1). It'll use
 \fBLOG_DAEMON\fP as \fIfacility\fP, so all messages should show up in
 your \fI/var/log/daemon.log\fP or similar. Regular messages are of
 \fIlevel\fP \fBLOG_INFO\fP, error conditions are \fBLOG_ERR\fP.
 .P
 Each line shows up as follows:
 .IP
-\fBbgopherd[\fP\fI<pid>\fP\fB]: '\fP\fI<host>\fP\fB' '\fP\fI<type>\fP\fB' '\fP\fI<selector>\fP\fB'\fP
+\fBsgopherd[\fP\fI<pid>\fP\fB]: '\fP\fI<host>\fP\fB' '\fP\fI<type>\fP\fB' '\fP\fI<selector>\fP\fB'\fP
 .P
 Where:
 .IP \(bu 4
@@ -168,7 +168,7 @@ Where:
 .IP \(bu 4
 \fI<host>\fP is the IP of the remote host. (x)inetd is expected to fill
 the environment variable $\fBREMOTE_HOST\fP when launching
-\fBbgopherd\fP.
+\fBsgopherd\fP.
 .IP \(bu 4
 \fI<type>\fP shows the type of the served ressource, such as
 \fBINDEX\fP, \fBINDEX.dcgi\fP, \fBAUTOINDEX\fP, \fBCGI\fP, \fBDCGI\fP or
@@ -181,30 +181,30 @@ then \fBINVALID\fP will show up in your logfile.
 .PD 0
 \fI/etc/inetd.conf\fP
 .TP
-\fI/etc/xinetd.d/bgopherd\fP
-\fBinetd\fP(8) or \fBxinetd\fP(8) config file for \fBbgopherd\fP.
+\fI/etc/xinetd.d/sgopherd\fP
+\fBinetd\fP(8) or \fBxinetd\fP(8) config file for \fBsgopherd\fP.
 .PD
 .TP
 \fI/var/log/daemon.log\fP
-\fBbgopherd\fP's log messages sent to syslog should end up this file.
+\fBsgopherd\fP's log messages sent to syslog should end up this file.
 May be different on your system.
 .SH BUGS
 If you find a bug, I'd happy to hear about it. Either use the bug
-tracker at \fIhttps://github.com/vain/bgopherd\fP or send an e-mail to
+tracker at \fIhttps://github.com/vain/sgopherd\fP or send an e-mail to
 \fIpcode@uninformativ.de\fP. If that doesn't work, then you should find
 up to date contact information at \fIhttp://uninformativ.de\fP or
 \fIgopher://uninformativ.de\fP.
 .P
-Currently, \fBbgopherd\fP requires GNU \fBbash\fP(1) and GNU
+Currently, \fBsgopherd\fP requires GNU \fBbash\fP(1) and GNU
 \fBsed\fP(1). This means that it won't run on non-GNU systems such as
 the BSD family \(en unless you install those GNU programs.  Porting
-\fBbgopherd\fP to POSIX \fBsh\fP(1p) will most likely result in a
+\fBsgopherd\fP to POSIX \fBsh\fP(1p) will most likely result in a
 complete rewrite. Porting it to POSIX \fBsed\fP(1p), however, should not
 be that hard.
 .P
 The RFC requires that, in some circumstances, a line containing only one
 single dot is sent. For example, gopher menus must end with such a line.
-\fBbgopherd\fP does not send this extra dot. Most other servers I found
+\fBsgopherd\fP does not send this extra dot. Most other servers I found
 don't do this, either. Nowadays, clients are intelligent enough not to
 require this dot.
 .SH "SEE ALSO"
