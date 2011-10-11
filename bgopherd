@@ -35,16 +35,6 @@ rel2abs()
 	[[ -f "$1" ]] && { (cd -- "${1%/*}"; echo "$PWD/${1##*/}"); return; }
 }
 
-dirEmpty()
-{
-	# Test if the directory $1 is empty. If there's at least one
-	# non-hidden file, then the new $1 will contain it's name. If
-	# there's NO file, then $1 will contain "$1/*" which does not exist.
-
-	set -- "$1"/*
-	[[ ! -e "$1" ]]
-}
-
 parseIndex()
 {
 	# Parse an index file. The syntax is similar to the one of geomyidae
@@ -92,10 +82,11 @@ isDCGI()
 sendListing()
 {
 	# Auto-create a menu, try to guess file types.
-
-	dirEmpty "$1" && return
-
 	for i in "$1"/*; do
+		# Skip non-existing files, including empty directories (in this
+		# case, "$1"/* will expand to "$1"/* which does not exist).
+		[[ -e "$i" ]] || continue
+
 		if [[ -d "$i" ]]; then
 			itype=1
 		else
