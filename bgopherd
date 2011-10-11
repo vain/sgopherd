@@ -62,21 +62,12 @@ parseIndex()
 		"$@"
 }
 
-isCGI()
+isScript()
 {
-	# Any executable file with a name ending in ".cgi" is meant to be a
-	# script. It'll be executed when requested by a client, its output
-	# is shown without further post-processing.
+	# Any executable file "$1" with a name ending in ".$2" is meant to
+	# be a script.
 
-	[[ -x "$1" ]] && [[ "${1##*.}" == "cgi" ]]
-}
-
-isDCGI()
-{
-	# See isCGI(). However, the output of a DCGI file is piped into
-	# parseIndex().
-
-	[[ -x "$1" ]] && [[ "${1##*.}" == "dcgi" ]]
+	[[ -x "$1" ]] && [[ "${1##*.}" == "$2" ]]
 }
 
 sendListing()
@@ -94,7 +85,7 @@ sendListing()
 			# any of the following conditions matches, then $itype will
 			# get overwritten.
 			itype=0
-			if isDCGI "$i"; then
+			if isScript "$i" "dcgi"; then
 				# As DCGI files are always piped into parseIndex(), they
 				# must be menus. However, if their name begins with
 				# "query_", then this script can receive search queries.
@@ -159,17 +150,17 @@ if [[ "${absreq:0:${#docroot}}" == "$docroot" ]]; then
 		if [[ -f "$absreq"/INDEX ]]; then
 			rtype="INDEX"
 			parseIndex "${absreq:${#docroot}}" "$absreq"/INDEX
-		elif isDCGI "$absreq"/INDEX.dcgi; then
+		elif [[ -x "$absreq"/INDEX.dcgi ]]; then
 			rtype="INDEX.dcgi"
 			run "$absreq"/INDEX.dcgi | parseIndex "${absreq:${#docroot}}"
 		else
 			rtype="AUTOINDEX"
 			sendListing "$absreq"
 		fi
-	elif isCGI "$absreq"; then
+	elif isScript "$absreq" "cgi"; then
 		rtype="CGI"
 		echo "$search" | run "$absreq"
-	elif isDCGI "$absreq"; then
+	elif isScript "$absreq" "dcgi"; then
 		# If a DCGI script outputs a relative path, then this path is
 		# meant to be relative to the scripts location.
 		rtype="DCGI"
