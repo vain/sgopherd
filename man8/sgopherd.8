@@ -1,6 +1,6 @@
-.TH BGOPHERD 8  "October 2011" "sgopherd" "Bash Gopher Daemon"
+.TH BGOPHERD 8  "October 2011" "sgopherd" "Small Gopher Daemon"
 .SH NAME
-sgopherd \- A gopher server written in
+sgopherd \- A small gopher server written in
 .BR bash (1).
 .SH SYNOPSIS
 \fBsgopherd\fP
@@ -27,6 +27,10 @@ search queries and
 basic file type detection.
 .P
 Internally, \fBsgopherd\fP uses GNU \fBsed\fP(1).
+.P
+Not counting commented lines, \fBsgopherd\fP tries not to exceed 100
+lines of code (with a tolerance of roughly 20 lines). The script should
+be easy to read and easy to understand.
 .SH OPTIONS
 .TP
 \fB\-n\fP \fIname\fP
