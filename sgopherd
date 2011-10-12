@@ -108,7 +108,8 @@ sendListing()
 						html|htm|xhtm|xhtml) itype=h ;;
 						jpeg|jpg|png|tif|tiff|bmp|svg) itype=I ;;
 						gz|xz|tar|tgz|zip|bz|bz2) itype=5 ;;
-						exe|bin|iso|img|mp3|ogg|wav|pdf|ps) itype=9 ;;
+						exe|bin|iso|img|pdf|ps) itype=9 ;;
+						mp3|ogg|wav|aif|aiff|aifc|snd) itype=s ;;
 						gif) itype=g ;;
 					esac
 				fi
