@@ -72,8 +72,8 @@ isScript()
 
 sendListing()
 {
-	if [[ -f "$1"/HEADER ]]; then
-		parseIndex "${1:${#docroot}}" "$1"/HEADER
+	if [[ -f "$1"/.HEADER ]]; then
+		parseIndex "${1:${#docroot}}" "$1"/.HEADER
 		printf 'i\t-\t-\t0\r\n'
 	fi
 
@@ -82,9 +82,6 @@ sendListing()
 		# Skip non-existing files, including empty directories (in this
 		# case, "$1"/* will expand to "$1"/* which does not exist).
 		[[ -e "$i" ]] || continue
-
-		# Skip HEADER files.
-		[[ "${i##*/}" == "HEADER" ]] && continue
 
 		if [[ -d "$i" ]]; then
 			itype=1
@@ -152,17 +149,17 @@ search=${search%%$'\t'*}
 # impossible to request something like "/..".
 absreq=$(rel2abs "$docroot$selector")
 if [[ "${absreq:0:${#docroot}}" == "$docroot" ]]; then
-	# In directories, try to find a file called INDEX which may be a
-	# manually created menu. An INDEX.dcgi script may be used to
+	# In directories, try to find a file called .INDEX which may be a
+	# manually created menu. An .INDEX.dcgi script may be used to
 	# dynamically create a menu. Otherwise, we'll simply show the
 	# directories contents.
 	if [[ -d "$absreq" ]]; then
-		if [[ -f "$absreq"/INDEX ]]; then
+		if [[ -f "$absreq"/.INDEX ]]; then
 			rtype="INDEX"
-			parseIndex "${absreq:${#docroot}}" "$absreq"/INDEX
-		elif [[ -x "$absreq"/INDEX.dcgi ]]; then
+			parseIndex "${absreq:${#docroot}}" "$absreq"/.INDEX
+		elif [[ -x "$absreq"/.INDEX.dcgi ]]; then
 			rtype="INDEX.dcgi"
-			run "$absreq"/INDEX.dcgi | parseIndex "${absreq:${#docroot}}"
+			run "$absreq"/.INDEX.dcgi | parseIndex "${absreq:${#docroot}}"
 		else
 			rtype="AUTOINDEX"
 			sendListing "$absreq"
