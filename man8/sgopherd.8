@@ -25,6 +25,8 @@ manual menus using plain text \fI.INDEX\fP files,
 manual annotation of single files in auto-generated menus using
 \fI.<filename>.ANN\fP files,
 .IP \(bu 4
+ignore sets of files in auto-generated menus using \fI.IGNORE\fP files,
+.IP \(bu 4
 search queries,
 .IP \(bu 4
 logging to syslog and
@@ -151,6 +153,21 @@ To avoid this, for each file or directory it is checked if another file
 called \fI.<filename>.ANN\fP exists. This file will be parsed according
 to the index file format and will be shown right before the menu item
 for file \fI<filename>\fP.
+.P
+If a directory contains a file \fI.IGNORE\fP, then the contents of this
+file are set as the value for $\fBGLOBIGNORE\fP (see \fBbash\fP(1) for
+further information). You can use this to ignore specific files. For
+example, if your \fI.IGNORE\fP contained the following line, then all
+files ending in \(lq.groff\(rq or \(lq.log\(rq would not show up in
+auto-generated indices:
+.P
+\f(CW
+.nf
+	*.groff:*.log
+.fi
+\fP
+.P
+Keep in mind: This only applies to auto-generated menus.
 .SH "DYNAMIC CONTENT"
 .SS "CGI scripts"
 Every executable file is treated as a CGI script if the file name ends

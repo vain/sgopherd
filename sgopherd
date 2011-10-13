@@ -77,8 +77,17 @@ sendListing()
 		printf 'i\t-\t-\t0\r\n'
 	fi
 
+	# Read in additional patterns which shall be ignored.
+	[[ -f "$1"/.IGNORE ]] && GLOBIGNORE="$(<"$1"/.IGNORE)"
+	shopt -u dotglob
+
 	# Auto-create a menu, try to guess file types.
 	for i in "$1"/*; do
+		#    ^^^^^^ This expression has already been processed, so it's
+		# safe (and wise) to unset GLOBIGNORE. This avoids unexpected
+		# side effects.
+		unset GLOBIGNORE
+
 		# Skip non-existing files, including empty directories (in this
 		# case, "$1"/* will expand to "$1"/* which does not exist).
 		[[ -e "$i" ]] || continue
