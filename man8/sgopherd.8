@@ -152,7 +152,7 @@ called \fI.<filename>.ANN\fP exists. This file will be parsed according
 to the index file format and will be shown right before the menu item
 for file \fI<filename>\fP.
 .SH "DYNAMIC CONTENT"
-.SS CGI scripts
+.SS "CGI scripts"
 Every executable file is treated as a CGI script if the file name ends
 in \(lq.cgi\(rq. If such a file is requested, it is executed and the
 output on \fBstdout\fP is sent to the client. If a search string was
@@ -160,12 +160,12 @@ supplied, then this string is written to the script's \fBstdin\fP. The
 script's working directory is the same as its location.
 .P
 Note: There are no environment variables provided to the script, yet.
-.SS DCGI scripts
+.SS "DCGI scripts"
 Pretty much the same as CGI scripts but the file name must end with
 \(lq.dcgi\(rq. Furthermore, the script's output will be interpreted
 according to the index file format. This mechanism allows you to
 dynamically create gopher menus.
-.SS Notes on Security
+.SS "Notes on Security"
 Please note that (D)CGI scripts are run as the same user as
 \fBsgopherd\fP itself. Also, there are no special security mechanisms in
 effect. That is, if the \fBsgopherd\fP-user has the rights to erase your
