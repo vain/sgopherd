@@ -22,6 +22,9 @@ automatic dynamic menu creation using \fI.INDEX.dcgi\fP scripts,
 .IP \(bu 4
 manual menus using plain text \fI.INDEX\fP files,
 .IP \(bu 4
+manual annotation of single files in auto-generated menus using
+\fI.<filename>.ANN\fP files,
+.IP \(bu 4
 search queries,
 .IP \(bu 4
 logging to syslog and
@@ -135,10 +138,19 @@ execute the DCGI script (see below) \fI.INDEX.dcgi\fP (if it exists) and
 parse its output according to the index file format, or otherwise
 .IP \(bu 4
 create a simple menu containing all non-hidden files in the directory.
-Files and directories beginning with a dot are considered hidden. If a
-file called \fI.HEADER\fP exists in the directory, then this file will
-be parsed according to the index file format and it will be shown on top
-of the menu. \fI.HEADER\fP files are not shown in the menu itself.
+Files and directories beginning with a dot are considered hidden.
+.SS "Special functions for auto-generated menus"
+If a file called \fI.HEADER\fP exists in the directory, then this file
+will be parsed according to the index file format and it will be shown
+on top of the menu. \fI.HEADER\fP files are not shown in the menu
+itself.
+.P
+Sometimes, you may want to add an annotation to one single file.
+Normally, this would require you to write a complete \fI.INDEX\fP file.
+To avoid this, for each file or directory it is checked if another file
+called \fI.<filename>.ANN\fP exists. This file will be parsed according
+to the index file format and will be shown right before the menu item
+for file \fI<filename>\fP.
 .SH "DYNAMIC CONTENT"
 .SS CGI scripts
 Every executable file is treated as a CGI script if the file name ends

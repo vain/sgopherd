@@ -83,6 +83,12 @@ sendListing()
 		# case, "$1"/* will expand to "$1"/* which does not exist).
 		[[ -e "$i" ]] || continue
 
+		# For each file, there may be a ".<filename>.ANN". This file
+		# shall be parsed and shown right before the menu item. As that
+		# file begins with a dot, it's not shown in the menu.
+		annfile="${i%/*}/.${i##*/}.ANN"
+		[[ -f "$annfile" ]] && parseIndex "${1:${#docroot}}" "$annfile"
+
 		if [[ -d "$i" ]]; then
 			itype=1
 		else
