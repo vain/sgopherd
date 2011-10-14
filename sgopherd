@@ -59,7 +59,7 @@ parseIndex()
 		-e '/^\[/ { s,^\(...[^|]\+|\)!\([^|]\+\),\1\2, }' \
 		-e '/^\[/ { s/\[//; s/^\(.\)|/\1/; s/\]//; s/|/\t/g }' \
 		-e 's/$/\r/' \
-		"$@"
+		-- "$@"
 }
 
 isScript()
@@ -118,7 +118,7 @@ sendListing()
 			else
 				# Use file(1) to guess file type. Defaults to a binary
 				# file.
-				case "$(file -b --mime-type "$i")" in
+				case "$(file -b --mime-type -- "$i")" in
 					application/x-gzip|application/x-xz|application/x-bzip2|\
 					application/zip) itype=5 ;;
 					audio/*|application/ogg) itype=s ;;
