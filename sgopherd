@@ -153,7 +153,7 @@ run()
 # --- Process a request.
 # Read a line from STDIN. First, remove any CRs and extract selector and
 # search query (if any). Discard anything after a second TAB.
-read -r request
+read -r -n 1000 request
 request=${request//$'\r'/}
 selector=${request%%$'\t'*}
 search=${request:${#selector}+1}
