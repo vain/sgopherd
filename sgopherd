@@ -101,10 +101,10 @@ sendListing()
 		if [[ -d "$i" ]]; then
 			itype=1
 		else
-			# The default type for files is 0, that is plain text. If
-			# any of the following conditions matches, then $itype will
-			# get overwritten.
-			itype=0
+			# The default type for files is 9, that is binary. If any of
+			# the following conditions matches, then $itype will get
+			# overwritten.
+			itype=9
 			if isScript "$i" "dcgi"; then
 				# As DCGI files are always piped into parseIndex(), they
 				# must be menus. However, if their name begins with
@@ -116,18 +116,17 @@ sendListing()
 					itype=7
 				fi
 			else
-				# Try to deduce file types from file name extensions.
-				ext=${i##*.}
-				if [[ -n "$ext" ]]; then
-					case "${ext,,}" in
-						html|htm|xhtm|xhtml) itype=h ;;
-						jpeg|jpg|png|tif|tiff|bmp|svg) itype=I ;;
-						gz|xz|tar|tgz|zip|bz|bz2) itype=5 ;;
-						exe|bin|iso|img|pdf|ps) itype=9 ;;
-						mp3|ogg|wav|aif|aiff|aifc|snd) itype=s ;;
-						gif) itype=g ;;
-					esac
-				fi
+				# Use file(1) to guess file type. Defaults to a binary
+				# file.
+				case "$(file -b --mime-type "$i")" in
+					application/x-gzip|application/x-xz|application/x-bzip2|\
+					application/zip) itype=5 ;;
+					audio/*|application/ogg) itype=s ;;
+					image/gif) itype=g ;;
+					image/*) itype=I ;;
+					text/*) itype=0 ;;
+					*) itype=9 ;;
+				esac
 			fi
 		fi
 
