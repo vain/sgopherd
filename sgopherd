@@ -29,7 +29,7 @@ rel2abs()
 	# because that would break support for symbolic links which point
 	# outside the document root. Instead, temporarily change into the
 	# directory, then print the current directory. This way, the kernel
-	# resolves relativ paths.
+	# resolves relative paths.
 
 	[[ -d "$1" ]] && { (cd -- "$1"; echo "$PWD"); return; }
 	[[ -f "$1" ]] && { (cd -- "${1%/*}"; echo "$PWD/${1##*/}"); return; }
