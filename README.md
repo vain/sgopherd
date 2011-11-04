@@ -10,7 +10,11 @@ inetd(8) or xinetd(8). Despite being tiny, sgopherd supports
 * automatic indexing,
 * automatic dynamic menu creation using INDEX.dcgi scripts,
 * manual menus using plain text INDEX files,
-* search queries and
+* custom headers in auto-generated menus using .HEADER files,
+* manual annotation of single files in auto-generated menus using .ANN files,
+* ignore sets of files in auto-generated menus using .IGNORE files,
+* search queries,
+* logging to syslog and
 * basic file type detection.
 
 Internally, sgopherd uses GNU sed(1).
