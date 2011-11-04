@@ -1,6 +1,6 @@
 # Maintainer: Vain
 pkgname=sgopherd-git
-pkgver=20111011
+pkgver=20111104
 pkgrel=1
 pkgdesc="A gopher server written in Bash"
 arch=('any')
@@ -19,8 +19,7 @@ source=()
 noextract=()
 md5sums=() #generate with 'makepkg -g'
 
-# TODO: Replace with URL at GitHub
-_gitroot=~/work/shell/sgopherd
+_gitroot="git://github.com/vain/sgopherd.git"
 _gitname="master"
 
 build() {
