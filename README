@@ -264,17 +264,8 @@ BUGS
        are intelligent enough not to require this dot.
 
 LICENSE
-       sgopherd  is released as “PIZZA-WARE”. The header of the script
-       says it all:
-
-              “THE PIZZA-WARE LICENSE” (Revision 42):
-              Peter Hofmann <pcode@uninformativ.de> wrote  this  file.
-              As  long  as  you retain this notice you can do whatever
-              you want with this stuff. If we meet some day,  and  you
-              think  this stuff is worth it, you can buy me a pizza in
-              return.
-
-       So, have fun. :-)
+       sgopherd  is  released  as  “PIZZA-WARE”.  See the accompanying
+       LICENSE file.
 
 HISTORY
        2011 – Originally written by  Peter  Hofmann  (pcode@uninforma‐
