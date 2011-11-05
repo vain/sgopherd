@@ -1,23 +1,14 @@
 # Maintainer: Vain
 pkgname=sgopherd-git
-pkgver=20111104
+pkgver=20111105
 pkgrel=1
 pkgdesc="A gopher server written in Bash"
 arch=('any')
 url="gopher://uninformativ.de/1/gopher/sgopherd/"
-license=('GPL')
-groups=()
-depends=('xinetd')
+license=('custom:PIZZA-WARE')
+depends=('bash' 'xinetd')
 makedepends=('git')
-provides=()
-conflicts=()
-replaces=()
 backup=('etc/xinetd.d/sgopherd')
-options=()
-install=
-source=()
-noextract=()
-md5sums=() #generate with 'makepkg -g'
 
 _gitroot="git://github.com/vain/sgopherd.git"
 _gitname="master"
@@ -43,9 +34,9 @@ build() {
 
 package() {
   cd "$srcdir/$_gitname-build"
-  install -Dm755 sgopherd $pkgdir/usr/bin/sgopherd
-  install -Dm644 xinetd-example.conf $pkgdir/etc/xinetd.d/sgopherd
-  install -Dm644 man8/sgopherd.8 $pkgdir/usr/share/man/man8/sgopherd.8
+  install -Dm755 sgopherd "$pkgdir"/usr/bin/sgopherd
+  install -Dm644 xinetd-example.conf "$pkgdir"/etc/xinetd.d/sgopherd
+  install -Dm644 man8/sgopherd.8 "$pkgdir"/usr/share/man/man8/sgopherd.8
 }
 
 # vim:set ts=2 sw=2 et:
