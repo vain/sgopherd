@@ -115,6 +115,7 @@ sendListing()
 					audio/*|application/ogg) itype=s ;;
 					image/gif) itype=g ;;
 					image/*) itype=I ;;
+					text/html) itype=h ;;
 					text/*) itype=0 ;;
 					*) itype=9 ;;
 				esac
