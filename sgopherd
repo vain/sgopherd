@@ -109,7 +109,7 @@ sendListing()
 			else
 				# Use file(1) to guess file type. Defaults to a binary
 				# file.
-				case "$(file -b --mime-type -- "$i")" in
+				case "$(file -b -L --mime-type -- "$i")" in
 					application/x-gzip|application/x-xz|application/x-bzip2|\
 					application/zip) itype=5 ;;
 					audio/*|application/ogg) itype=s ;;
