@@ -1,4 +1,4 @@
-BGOPHERD(8)               Small Gopher Daemon              BGOPHERD(8)
+SGOPHERD(8)               Small Gopher Daemon              SGOPHERD(8)
 
 
 
@@ -277,4 +277,4 @@ SEE ALSO
 
 
 
-sgopherd                     October 2011                  BGOPHERD(8)
+sgopherd                     October 2011                  SGOPHERD(8)
