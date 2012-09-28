@@ -1,0 +1,8 @@
+[Unit]
+Description=sgopherd per-connection server
+
+[Service]
+ExecStart=/usr/bin/sgopherd-systemd %i -n myhostname -r /srv/gopher
+StandardInput=socket
+StandardOutput=socket
+StandardError=syslog
