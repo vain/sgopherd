@@ -88,6 +88,8 @@ CONFIGURATION — XINETD
        default port for the gopher service),  then  sgopherd  will  be
        executed.
 
+       Remember to set disable = no if you wish to run sgopherd.
+
 CONFIGURATION — SYSTEMD
        If  you  don't like (x)inetd anymore, it's also possible to use
        systemd's socket activation to run  sgopherd.  In  contrast  to
@@ -150,16 +152,19 @@ CONFIGURATION — SYSTEMD
        instead  of  /usr/lib/systemd/system because you'll most likely
        want to change the parameters for -n and -r.
 
+       To run sgopherd through systemd, you'd  have  to  do  systemctl
+       enable sgopherd.socket or systemctl start sgopherd.socket.
+
 INDEX FILE FORMAT
        The gopher protocol is trivial in technical terms but it's cum‐
-       bersome  to  write  gopher  menus by hand. Hence, the following
+       bersome to write gopher menus by  hand.  Hence,  the  following
        file format simplifies this process. It's pretty similar to the
-       format  of  index.gph  files  in  geomyidae(8),  another gopher
+       format of  index.gph  files  in  geomyidae(8),  another  gopher
        server.
 
-       An index file may contain arbitrary text  which  is  translated
-       into  an  “informational  text” item in the gopher menu. On the
-       other hand, a line beginning with an opening  bracket  will  be
+       An  index  file  may contain arbitrary text which is translated
+       into an “informational text” item in the gopher  menu.  On  the
+       other  hand,  a  line beginning with an opening bracket will be
        interpreted by sgopherd and will create a menu item. It has the
        following structure:
 
@@ -171,20 +176,20 @@ INDEX FILE FORMAT
 
        ·   <desc> is the description of the item.
 
-       ·   <path> is an absolute or relative path to the gopher  item.
-           Relative  paths  are  meant  to  be relative to the current
-           directory and should only point to a location on  the  cur‐
-           rent  host.  Note:  When using gopher+ “URL links” you must
-           place an exclamation mark in front of <path>.  To  be  more
-           precise,  an  exclamation mark disables automatic prefixing
+       ·   <path>  is an absolute or relative path to the gopher item.
+           Relative paths are meant to  be  relative  to  the  current
+           directory  and  should only point to a location on the cur‐
+           rent host. Note: When using gopher+ “URL  links”  you  must
+           place  an  exclamation  mark in front of <path>. To be more
+           precise, an exclamation mark disables  automatic  prefixing
            for relativ paths.
 
        ·   <host> is the target host. If this is set to “server”, then
-           the  server's  hostname  is  used  (see  configuration item
+           the server's  hostname  is  used  (see  configuration  item
            servername).
 
-       ·   <port> is the port of the target host. If this  is  set  to
-           “port”,  then the local server's port is used (see configu‐
+       ·   <port>  is  the  port of the target host. If this is set to
+           “port”, then the local server's port is used (see  configu‐
            ration item serverport).
 
        Thus, an index file could read as follows:
@@ -207,35 +212,35 @@ INDEX FILE FORMAT
 INDEXING
        If a directory is requested by the client, sgopherd will
 
-       ·   read  and  parse  the  special file .INDEX if it exists, or
+       ·   read and parse the special file .INDEX  if  it  exists,  or
            otherwise
 
-       ·   execute the DCGI script  (see  below)  .INDEX.dcgi  (if  it
-           exists)  and  parse  its output according to the index file
+       ·   execute  the  DCGI  script  (see  below) .INDEX.dcgi (if it
+           exists) and parse its output according to  the  index  file
            format, or otherwise
 
        ·   create a simple menu containing all non-hidden files in the
-           directory.   Files and directories beginning with a dot are
+           directory.  Files and directories beginning with a dot  are
            considered hidden.
 
    Special functions for auto-generated menus
-       If a file called .HEADER exists in  the  directory,  then  this
-       file  will  be parsed according to the index file format and it
-       will be shown on top of the menu. .HEADER files are  not  shown
+       If  a  file  called  .HEADER exists in the directory, then this
+       file will be parsed according to the index file format  and  it
+       will  be  shown on top of the menu. .HEADER files are not shown
        in the menu itself.
 
-       Sometimes,  you  may  want  to  add an annotation to one single
-       file.  Normally, this would require you  to  write  a  complete
-       .INDEX  file.   To avoid this, for each file or directory it is
-       checked if another file  called  .<filename>.ANN  exists.  This
+       Sometimes, you may want to add  an  annotation  to  one  single
+       file.   Normally,  this  would  require you to write a complete
+       .INDEX file.  To avoid this, for each file or directory  it  is
+       checked  if  another  file  called .<filename>.ANN exists. This
        file will be parsed according to the index file format and will
        be shown right before the menu item for file <filename>.
 
-       If a directory contains a file .IGNORE, then  the  contents  of
+       If  a  directory  contains a file .IGNORE, then the contents of
        this file are set as the value for $GLOBIGNORE (see bash(1) for
-       further information). You  can  use  this  to  ignore  specific
-       files.  For  example,  if  your .IGNORE contained the following
-       line, then all files ending in “.groff”  or  “.log”  would  not
+       further  information).  You  can  use  this  to ignore specific
+       files. For example, if your  .IGNORE  contained  the  following
+       line,  then  all  files  ending in “.groff” or “.log” would not
        show up in auto-generated indices:
 
 
@@ -246,27 +251,27 @@ INDEXING
 
 DYNAMIC CONTENT
    CGI scripts
-       Every  executable  file  is treated as a CGI script if the file
-       name ends in “.cgi”. If such a file is requested,  it  is  exe‐
-       cuted  and  the  output  on  stdout is sent to the client. If a
-       search string was supplied, then this string is written to  the
-       script's  stdin.  The script's working directory is the same as
+       Every executable file is treated as a CGI script  if  the  file
+       name  ends  in  “.cgi”. If such a file is requested, it is exe‐
+       cuted and the output on stdout is sent  to  the  client.  If  a
+       search  string was supplied, then this string is written to the
+       script's stdin. The script's working directory is the  same  as
        its location.
 
-       Note: There  are  no  environment  variables  provided  to  the
+       Note:  There  are  no  environment  variables  provided  to the
        script, yet.
 
    DCGI scripts
-       Pretty  much the same as CGI scripts but the file name must end
-       with “.dcgi”. Furthermore, the script's output will  be  inter‐
-       preted  according  to  the  index  file  format. This mechanism
+       Pretty much the same as CGI scripts but the file name must  end
+       with  “.dcgi”.  Furthermore, the script's output will be inter‐
+       preted according to  the  index  file  format.  This  mechanism
        allows you to dynamically create gopher menus.
 
    Notes on Security
-       Please note that (D)CGI scripts are run as  the  same  user  as
+       Please  note  that  (D)CGI  scripts are run as the same user as
        sgopherd itself. Also, there are no special security mechanisms
-       in effect. That is, if the  sgopherd-user  has  the  rights  to
-       erase  your  hard  drive,  then  every (D)CGI script can do the
+       in  effect.  That  is,  if  the sgopherd-user has the rights to
+       erase your hard drive, then every  (D)CGI  script  can  do  the
        same!
 
        As (D)CGI scripts can receive user input that may be malicious,
@@ -274,8 +279,8 @@ DYNAMIC CONTENT
 
 LOGGING
        sgopherd will log to syslog using logger(1). It'll use LOG_DAE‐
-       MON as facility,  so  all  messages  should  show  up  in  your
-       /var/log/daemon.log  or  similar. Regular messages are of level
+       MON  as  facility,  so  all  messages  should  show  up in your
+       /var/log/daemon.log or similar. Regular messages are  of  level
        LOG_INFO, error conditions are LOG_ERR.
 
        Each line shows up as follows:
@@ -284,17 +289,17 @@ LOGGING
 
        Where:
 
-       ·   <pid> is the process ID of the shell script as  invoked  by
+       ·   <pid>  is  the process ID of the shell script as invoked by
            (x)inetd or systemd.
 
-       ·   <host>  is  the IP of the remote host. (x)inetd is expected
-           to fill the environment variable $REMOTE_HOST when  launch‐
-           ing  sgopherd. When using systemd, the wrapper script (sgo‐
+       ·   <host> is the IP of the remote host. (x)inetd  is  expected
+           to  fill the environment variable $REMOTE_HOST when launch‐
+           ing sgopherd. When using systemd, the wrapper script  (sgo‐
            pherd-systemd) takes care of this.
 
-       ·   <type> shows the type of  the  served  ressource,  such  as
-           INDEX,  INDEX.dcgi,  AUTOINDEX,  CGI,  DCGI or FILE. If the
-           request was invalid or the file could not  be  found,  then
+       ·   <type>  shows  the  type  of  the served ressource, such as
+           INDEX, INDEX.dcgi, AUTOINDEX, CGI, DCGI  or  FILE.  If  the
+           request  was  invalid  or the file could not be found, then
            INVALID will show up in your logfile.
 
        ·   <selector> is the full request sent by the client.
@@ -311,38 +316,38 @@ FILES
               socket activation.
 
        /var/log/daemon.log
-              sgopherd's log messages sent to  syslog  should  end  up
+              sgopherd's  log  messages  sent  to syslog should end up
               this file.  May be different on your system.
 
 BUGS
-       If  you  find a bug, I'd happy to hear about it. Either use the
-       bug tracker at https://github.com/vain/sgopherd or send  an  e-
-       mail  to  pcode@uninformativ.de. If that doesn't work, then you
+       If you find a bug, I'd happy to hear about it. Either  use  the
+       bug  tracker  at https://github.com/vain/sgopherd or send an e-
+       mail to pcode@uninformativ.de. If that doesn't work,  then  you
        should find up to date contact information at http://uninforma‐
        tiv.de or gopher://uninformativ.de.
 
-       Currently,  sgopherd  requires GNU bash(1) and GNU sed(1). This
+       Currently, sgopherd requires GNU bash(1) and GNU  sed(1).  This
        means that it won't run on non-GNU systems such as the BSD fam‐
-       ily  – unless you install those GNU programs.  Porting sgopherd
-       to POSIX sh(1p) will most likely result in a complete  rewrite.
+       ily – unless you install those GNU programs.  Porting  sgopherd
+       to  POSIX sh(1p) will most likely result in a complete rewrite.
        Porting it to POSIX sed(1p), however, should not be that hard.
 
        The RFC requires that, in some circumstances, a line containing
        only one single dot is sent. For example, gopher menus must end
-       with  such a line.  sgopherd does not send this extra dot. Most
-       other servers I found don't do this, either. Nowadays,  clients
+       with such a line.  sgopherd does not send this extra dot.  Most
+       other  servers I found don't do this, either. Nowadays, clients
        are intelligent enough not to require this dot.
 
 LICENSE
-       sgopherd  is  released  as  “PIZZA-WARE”.  See the accompanying
+       sgopherd is released  as  “PIZZA-WARE”.  See  the  accompanying
        LICENSE file.
 
 HISTORY
-       2011 – Originally written by  Peter  Hofmann  (pcode@uninforma‐
+       2011  –  Originally  written by Peter Hofmann (pcode@uninforma‐
        tiv.de).
 
 SEE ALSO
-       bash(1),  sed(1), file(1), inetd(8), xinetd(8), logger(1), sys‐
+       bash(1), sed(1), file(1), inetd(8), xinetd(8), logger(1),  sys‐
        log(3), geomyidae(8), RFC 1436.
 
 

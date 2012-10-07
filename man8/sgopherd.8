@@ -83,6 +83,8 @@ following could be used to integrate \fBsgopherd\fP into
 .P
 If (x)inetd is running and a client connects at port 70 (the default
 port for the gopher service), then \fBsgopherd\fP will be executed.
+.P
+Remember to set \fBdisable = no\fP if you wish to run \fBsgopherd\fP.
 .SH "CONFIGURATION \(em SYSTEMD"
 If you don't like (x)inetd anymore, it's also possible to use systemd's
 socket activation to run \fBsgopherd\fP. In contrast to inetd, systemd
@@ -149,6 +151,9 @@ scripts transforms this argument into something that's usable by
 You should place \fIsgopherd@.service\fP in \fI/etc/systemd/system\fP
 instead of \fI/usr/lib/systemd/system\fP because you'll most likely want
 to change the parameters for \fB\-n\fP and \fB\-r\fP.
+.P
+To run \fBsgopherd\fP through systemd, you'd have to do \fBsystemctl
+enable sgopherd.socket\fP or \fBsystemctl start sgopherd.socket\fP.
 .SH "INDEX FILE FORMAT"
 The gopher protocol is trivial in technical terms but it's cumbersome to
 write gopher menus by hand. Hence, the following file format simplifies
