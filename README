@@ -77,7 +77,7 @@ CONFIGURATION — XINETD
             {
                  socket_type     = stream
                  wait            = no
-                 user            = www-data
+                 user            = http
                  server          = /usr/bin/sgopherd
                  server_args     = -n myhostname -r /srv/gopher
                  disable         = no
@@ -118,7 +118,7 @@ CONFIGURATION — SYSTEMD
             Description=sgopherd per-connection server
 
             [Service]
-            User=www-data
+            User=http
             ExecStart=/usr/bin/sgopherd-systemd %i -n myhostname -r /srv/gopher
             StandardInput=socket
             StandardOutput=socket
