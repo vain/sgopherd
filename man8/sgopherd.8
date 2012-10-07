@@ -11,8 +11,9 @@ sgopherd \- A small gopher server written in
 \fBsgopherd\fP is a simple gopher server for Unix-like systems,
 preferably GNU. As it's implemented as a shell script (GNU Bash),
 there's no standalone daemon functionality. Thus, it's meant to be
-called by \fBinetd\fP(8) or \fBxinetd\fP(8). Despite being tiny,
-\fBsgopherd\fP supports
+called by something like \fBinetd\fP(8) or \fBxinetd\fP(8).
+\fBsgopherd\fP also works with \fBsystemd\fP(1)'s socket activation.
+Despite being tiny, \fBsgopherd\fP supports
 .IP \(bu 4
 dynamic content using CGI scripts and dynamic menus using DCGI scripts,
 .IP \(bu 4
@@ -46,7 +47,8 @@ easy to read and easy to understand.
 The server's hostname. This string will be used in menu items. This
 variable does \fBNOT\fP control on which network interfaces the server
 can be accessed. In fact, \fBsgopherd\fP knows nothing about networking;
-all of that must be configured in (x)inetd. (Default: \(lqlocalhost\(rq)
+all of that must be configured in (x)inetd or systemd. (Default:
+\(lqlocalhost\(rq)
 .TP
 \fB\-p\fP \fIport\fP
 The server's port. Again, this is only relevant for menu items.
@@ -57,7 +59,7 @@ The document root. This path \fBMUST NOT\fP end with a slash. No files
 outside of this directory can be served. However, it's possible to
 create symlinks in this directory which point to an arbitrary location.
 (Default: \(lq/srv/gopher\(rq)
-.SH CONFIGURATION
+.SH "CONFIGURATION \(em XINETD"
 There is no special configuration file for \fBsgopherd\fP. Everything is
 configured using the command line arguments. \fBinetd\fP(8) or
 \fBxinetd\fP(8), on the other hand, must be configured. Have a look at
@@ -81,6 +83,72 @@ following could be used to integrate \fBsgopherd\fP into
 .P
 If (x)inetd is running and a client connects at port 70 (the default
 port for the gopher service), then \fBsgopherd\fP will be executed.
+.SH "CONFIGURATION \(em SYSTEMD"
+If you don't like (x)inetd anymore, it's also possible to use systemd's
+socket activation to run \fBsgopherd\fP. In contrast to inetd, systemd
+does not set any environment variables which contain information about
+the remote host. \fBsgopherd\fP wants to write that information to
+syslog, though. It's up to you: Either you use a little wrapper script
+or you ignore this issue.
+.P
+\fIsgopherd.socket\fP and \fIsgopherd@.service\fP are provided. They
+look something like this:
+.P
+\fIsgopherd.socket\fP:
+.P
+\f(CW
+.nf
+	[Socket]
+	ListenStream=70
+	Accept=yes
+
+	[Install]
+	WantedBy=sockets.target
+.fi
+\fP
+.P
+\fIsgopherd@.service\fP:
+.P
+\f(CW
+.nf
+	[Unit]
+	Description=sgopherd per-connection server
+
+	[Service]
+	User=www-data
+	ExecStart=/usr/bin/sgopherd-systemd %i -n myhostname -r /srv/gopher
+	StandardInput=socket
+	StandardOutput=socket
+	StandardError=syslog
+.fi
+\fP
+.P
+Those files make use of the wrapper script \fIsgopherd-systemd\fP which,
+in itself, doesn't do very much:
+.P
+\f(CW
+.nf
+	#!/bin/bash
+
+	REMOTE_HOST=$1
+	shift
+
+	REMOTE_HOST=${REMOTE_HOST##*-}
+	REMOTE_HOST=${REMOTE_HOST%:*}
+
+	export REMOTE_HOST
+	exec sgopherd "$@"
+.fi
+\fP
+.P
+You may have noticed that we use the template form here. The \fB%i\fP
+gets replaced with information about the remote host and the wrapper
+scripts transforms this argument into something that's usable by
+\fBsgopherd\fP.
+.P
+You should place \fIsgopherd@.service\fP in \fI/etc/systemd/system\fP
+instead of \fI/usr/lib/systemd/system\fP because you'll most likely want
+to change the parameters for \fB\-n\fP and \fB\-r\fP.
 .SH "INDEX FILE FORMAT"
 The gopher protocol is trivial in technical terms but it's cumbersome to
 write gopher menus by hand. Hence, the following file format simplifies
@@ -204,11 +272,13 @@ Each line shows up as follows:
 .P
 Where:
 .IP \(bu 4
-\fI<pid>\fP is the process ID of shell script invoked by (x)inetd.
+\fI<pid>\fP is the process ID of the shell script as invoked by (x)inetd
+or systemd.
 .IP \(bu 4
 \fI<host>\fP is the IP of the remote host. (x)inetd is expected to fill
 the environment variable $\fBREMOTE_HOST\fP when launching
-\fBsgopherd\fP.
+\fBsgopherd\fP. When using systemd, the wrapper script
+(\fBsgopherd-systemd\fP) takes care of this.
 .IP \(bu 4
 \fI<type>\fP shows the type of the served ressource, such as
 \fBINDEX\fP, \fBINDEX.dcgi\fP, \fBAUTOINDEX\fP, \fBCGI\fP, \fBDCGI\fP or
@@ -217,12 +287,23 @@ then \fBINVALID\fP will show up in your logfile.
 .IP \(bu 4
 \fI<selector>\fP is the full request sent by the client.
 .SH FILES
-.TP
 .PD 0
+.TP
 \fI/etc/inetd.conf\fP
 .TP
 \fI/etc/xinetd.d/sgopherd\fP
 \fBinetd\fP(8) or \fBxinetd\fP(8) config file for \fBsgopherd\fP.
+.PD
+.P
+.PD 0
+.TP
+\fI/etc/systemd/system/sgopherd@.service\fP
+.TP
+\fI/usr/lib/systemd/system/sgopherd@.service\fP
+.TP
+\fI/usr/lib/systemd/system/sgopherd.socket\fP
+\fBsystemd\fP(1) config files for running \fBsgopherd\fP using socket
+activation.
 .PD
 .TP
 \fI/var/log/daemon.log\fP
