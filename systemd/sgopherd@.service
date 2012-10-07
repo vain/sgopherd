@@ -2,6 +2,7 @@
 Description=sgopherd per-connection server
 
 [Service]
+User=www-data
 ExecStart=/usr/bin/sgopherd-systemd %i -n myhostname -r /srv/gopher
 StandardInput=socket
 StandardOutput=socket
