@@ -12,10 +12,11 @@ DESCRIPTION
        sgopherd  is  a  simple  gopher  server  for Unix-like systems,
        preferably GNU. As it's implemented  as  a  shell  script  (GNU
        Bash),  there's  no standalone daemon functionality. Thus, it's
-       meant to be called by  inetd(8)  or  xinetd(8).  Despite  being
-       tiny, sgopherd supports
+       meant to be called by something  like  inetd(8)  or  xinetd(8).
+       sgopherd   also  works  with  systemd(1)'s  socket  activation.
+       Despite being tiny, sgopherd supports
 
-       ·   dynamic  content  using CGI scripts and dynamic menus using
+       ·   dynamic content using CGI scripts and dynamic  menus  using
            DCGI scripts,
 
        ·   automatic indexing,
@@ -26,10 +27,10 @@ DESCRIPTION
 
        ·   custom headers in auto-generated menus using .HEADER files,
 
-       ·   manual annotation of single files in  auto-generated  menus
+       ·   manual  annotation  of single files in auto-generated menus
            using .<filename>.ANN files,
 
-       ·   ignore  sets of files in auto-generated menus using .IGNORE
+       ·   ignore sets of files in auto-generated menus using  .IGNORE
            files,
 
        ·   search queries,
@@ -40,34 +41,34 @@ DESCRIPTION
 
        Internally, sgopherd uses GNU sed(1).
 
-       Not counting commented lines, sgopherd tries not to exceed  100
-       lines  of  code  (with  a  tolerance of some lines). The script
+       Not  counting commented lines, sgopherd tries not to exceed 100
+       lines of code (with a tolerance  of  some  lines).  The  script
        should be easy to read and easy to understand.
 
 OPTIONS
        -n name
-              The server's hostname. This string will be used in  menu
-              items.  This  variable does NOT control on which network
+              The  server's hostname. This string will be used in menu
+              items. This variable does NOT control on  which  network
               interfaces the server can be accessed. In fact, sgopherd
               knows nothing about networking; all of that must be con‐
-              figured in (x)inetd. (Default: “localhost”)
+              figured in (x)inetd or systemd. (Default: “localhost”)
 
        -p port
               The server's port. Again, this is only relevant for menu
               items.  (Default: “70”)
 
        -r docroot
-              The  document root. This path MUST NOT end with a slash.
-              No files outside of this directory can be  served.  How‐
+              The document root. This path MUST NOT end with a  slash.
+              No  files  outside of this directory can be served. How‐
               ever, it's possible to create symlinks in this directory
-              which  point  to  an  arbitrary   location.    (Default:
+              which   point   to  an  arbitrary  location.   (Default:
               “/srv/gopher”)
 
-CONFIGURATION
+CONFIGURATION — XINETD
        There is no special configuration file for sgopherd. Everything
-       is configured using the command  line  arguments.  inetd(8)  or
-       xinetd(8),  on  the other hand, must be configured. Have a look
-       at your (x)inetd documentation to learn how to do this.  As  an
+       is  configured  using  the  command line arguments. inetd(8) or
+       xinetd(8), on the other hand, must be configured. Have  a  look
+       at  your  (x)inetd documentation to learn how to do this. As an
        example, the following could be used to integrate sgopherd into
        xinetd(8):
 
@@ -83,9 +84,71 @@ CONFIGURATION
             }
 
 
-       If (x)inetd is running and a client connects at  port  70  (the
-       default  port  for  the  gopher service), then sgopherd will be
+       If  (x)inetd  is  running and a client connects at port 70 (the
+       default port for the gopher service),  then  sgopherd  will  be
        executed.
+
+CONFIGURATION — SYSTEMD
+       If  you  don't like (x)inetd anymore, it's also possible to use
+       systemd's socket activation to run  sgopherd.  In  contrast  to
+       inetd,  systemd  does  not  set any environment variables which
+       contain information about the remote host.  sgopherd  wants  to
+       write  that  information  to  syslog,  though.  It's up to you:
+       Either you use a little  wrapper  script  or  you  ignore  this
+       issue.
+
+       sgopherd.socket  and  sgopherd@.service are provided. They look
+       something like this:
+
+       sgopherd.socket:
+
+
+            [Socket]
+            ListenStream=70
+            Accept=yes
+
+            [Install]
+            WantedBy=sockets.target
+
+
+       sgopherd@.service:
+
+
+            [Unit]
+            Description=sgopherd per-connection server
+
+            [Service]
+            User=www-data
+            ExecStart=/usr/bin/sgopherd-systemd %i -n myhostname -r /srv/gopher
+            StandardInput=socket
+            StandardOutput=socket
+            StandardError=syslog
+
+
+       Those files make use of  the  wrapper  script  sgopherd-systemd
+       which, in itself, doesn't do very much:
+
+
+            #!/bin/bash
+
+            REMOTE_HOST=$1
+            shift
+
+            REMOTE_HOST=${REMOTE_HOST##*-}
+            REMOTE_HOST=${REMOTE_HOST%:*}
+
+            export REMOTE_HOST
+            exec sgopherd "$@"
+
+
+       You may have noticed that we use the template form here. The %i
+       gets replaced with information about the remote  host  and  the
+       wrapper  scripts transforms this argument into something that's
+       usable by sgopherd.
+
+       You  should  place  sgopherd@.service  in   /etc/systemd/system
+       instead  of  /usr/lib/systemd/system because you'll most likely
+       want to change the parameters for -n and -r.
 
 INDEX FILE FORMAT
        The gopher protocol is trivial in technical terms but it's cum‐
@@ -221,16 +284,17 @@ LOGGING
 
        Where:
 
-       ·   <pid>  is  the  process  ID  of  shell  script  invoked  by
-           (x)inetd.
+       ·   <pid> is the process ID of the shell script as  invoked  by
+           (x)inetd or systemd.
 
        ·   <host>  is  the IP of the remote host. (x)inetd is expected
            to fill the environment variable $REMOTE_HOST when  launch‐
-           ing sgopherd.
+           ing  sgopherd. When using systemd, the wrapper script (sgo‐
+           pherd-systemd) takes care of this.
 
-       ·   <type>  shows  the  type  of  the served ressource, such as
-           INDEX, INDEX.dcgi, AUTOINDEX, CGI, DCGI  or  FILE.  If  the
-           request  was  invalid  or the file could not be found, then
+       ·   <type> shows the type of  the  served  ressource,  such  as
+           INDEX,  INDEX.dcgi,  AUTOINDEX,  CGI,  DCGI or FILE. If the
+           request was invalid or the file could not  be  found,  then
            INVALID will show up in your logfile.
 
        ·   <selector> is the full request sent by the client.
@@ -239,6 +303,12 @@ FILES
        /etc/inetd.conf
        /etc/xinetd.d/sgopherd
               inetd(8) or xinetd(8) config file for sgopherd.
+
+       /etc/systemd/system/sgopherd@.service
+       /usr/lib/systemd/system/sgopherd@.service
+       /usr/lib/systemd/system/sgopherd.socket
+              systemd(1)  config  files  for  running  sgopherd  using
+              socket activation.
 
        /var/log/daemon.log
               sgopherd's log messages sent to  syslog  should  end  up
