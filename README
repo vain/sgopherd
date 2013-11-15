@@ -3,7 +3,7 @@ SGOPHERD(8)               Small Gopher Daemon              SGOPHERD(8)
 
 
 NAME
-       sgopherd - A small gopher server written in bash(1).
+       sgopherd - a small gopher server written in bash(1)
 
 SYNOPSIS
        sgopherd [-n name] [-p port] [-r docroot]
