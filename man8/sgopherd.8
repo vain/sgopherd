@@ -229,12 +229,12 @@ called \fI.<filename>.ANN\fP exists. This file will be parsed according
 to the index file format and will be shown right before the menu item
 for file \fI<filename>\fP.
 .P
-If a directory contains a file \fI.IGNORE\fP, then the contents of this
-file are set as the value for $\fBGLOBIGNORE\fP (see \fBbash\fP(1) for
-further information). You can use this to ignore specific files. For
-example, if your \fI.IGNORE\fP contained the following line, then all
-files ending in \(lq.groff\(rq or \(lq.log\(rq would not show up in
-auto-generated indices:
+A directory may contain a file called \fI.IGNORE\fP. Similar to bash's
+$\fBGLOBIGNORE\fP, it can contain a list of patterns to be excluded from
+auto-generated menus (patterns must be separated by colons). You can use
+this to ignore specific files. For example, if your \fI.IGNORE\fP
+contained the following line, then all files ending in \(lq.groff\(rq or
+\(lq.log\(rq would not show up in auto-generated indices:
 .P
 \f(CW
 .nf

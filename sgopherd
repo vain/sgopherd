@@ -49,6 +49,22 @@ isScript()
 	[[ -x "$1" ]] && [[ "${1##*.}" == "$2" ]]
 }
 
+matchesOnePattern()
+{
+	[[ -z "$2" ]] && return 1
+
+	m=1
+	oifs=$IFS
+	IFS=:
+	for pattern in $2
+	do
+		[[ "$1" == $pattern ]] && m=0 && break
+	done
+	IFS=$oifs
+
+	return $m
+}
+
 sendListing()
 {
 	if [[ -f "$1"/.HEADER ]]; then
@@ -57,15 +73,16 @@ sendListing()
 	fi
 
 	# Read in additional patterns which shall be ignored.
-	[[ -f "$1"/.IGNORE ]] && GLOBIGNORE="$(<"$1"/.IGNORE)"
+	[[ -f "$1"/.IGNORE ]] && ignore="$(<"$1"/.IGNORE)" || ignore=
 	shopt -u dotglob
 
 	# Auto-create a menu, try to guess file types.
 	for i in "$1"/*; do
-		#    ^^^^^^ This expression has already been processed, so it's
-		# safe (and wise) to unset GLOBIGNORE. This avoids unexpected
-		# side effects.
-		unset GLOBIGNORE
+		# We strip all leading directory names from $i, because we want
+		# the user to be able to put "foo.txt" in a .IGNORE file and it
+		# will ignore exactly that file name. Without stripping, the
+		# user would have to use "*foo.txt".
+		matchesOnePattern "${i##*/}" "$ignore" && continue
 
 		# Skip non-existing files, including empty directories (in this
 		# case, "$1"/* will expand to "$1"/* which does not exist).

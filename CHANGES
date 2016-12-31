@@ -1,0 +1,11 @@
+Release history for sgopherd
+
+next
+  [Fixed]
+  - .IGNORE files work again. They used to internally set $GLOBIGNORE,
+    which appears to have changed its behaviour. We now manually test
+    patterns listed in .IGNORE files.
+
+v16.08 and earlier
+  - Sorry, the CHANGES file did not exist back then. Please refer to the
+    git history.
