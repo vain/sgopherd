@@ -6,144 +6,143 @@ serverport="70"
 docroot=/srv/gopher
 
 while getopts n:p:r: name; do
-	case $name in
-		n) servername="$OPTARG" ;;
-		p) serverport="$OPTARG" ;;
-		r) docroot="$OPTARG" ;;
-	esac
+    case $name in
+        n) servername="$OPTARG" ;;
+        p) serverport="$OPTARG" ;;
+        r) docroot="$OPTARG" ;;
+    esac
 done
 
 # --- Library functions.
 parseIndex()
 {
-	# Parse an index file. The syntax is similar to the one of geomyidae
-	# (another gopher server). Lines beginning with a bracket denote a
-	# menu item, all other lines are informational text.
-	#
-	# Substitute "server" and "port" with the server's settings. Also
-	# turn relative paths into absolute ones: Paths that do not begin
-	# with a "/" are relative to $rel. However, if it begins with "!",
-	# remove that "!" and leave the path as is.
-	#
-	# Read from STDIN if $@ is empty.
+    # Parse an index file. The syntax is similar to the one of geomyidae
+    # (another gopher server). Lines beginning with a bracket denote a
+    # menu item, all other lines are informational text.
+    #
+    # Substitute "server" and "port" with the server's settings. Also
+    # turn relative paths into absolute ones: Paths that do not begin
+    # with a "/" are relative to $rel. However, if it begins with "!",
+    # remove that "!" and leave the path as is.
+    #
+    # Read from STDIN if $@ is empty.
 
-	rel=$1
-	shift
+    rel=$1
+    shift
 
-	sed \
-		-e '/^\[/! { s/.*/i&\t-\t-\t0/ }' \
-		-e '/^\[/ { s/\(.*\)|server|\([^|]\+\)]/\1|'"$servername"'|\2]/ }' \
-		-e '/^\[/ { s/\(.*\)|\([^|]\+\)|port]/\1|\2|'"$serverport"']/ }' \
-		-e '/^\[/ { s,^\(...[^|]\+|\)\([^/!]\),\1'"$rel"'/\2, }' \
-		-e '/^\[/ { s,^\(...[^|]\+|\)!\([^|]\+\),\1\2, }' \
-		-e '/^\[/ { s/\[//; s/^\(.\)|/\1/; s/\]//; s/|/\t/g }' \
-		-e 's/$/\r/' \
-		-- "$@"
+    sed \
+        -e '/^\[/! { s/.*/i&\t-\t-\t0/ }' \
+        -e '/^\[/ { s/\(.*\)|server|\([^|]\+\)]/\1|'"$servername"'|\2]/ }' \
+        -e '/^\[/ { s/\(.*\)|\([^|]\+\)|port]/\1|\2|'"$serverport"']/ }' \
+        -e '/^\[/ { s,^\(...[^|]\+|\)\([^/!]\),\1'"$rel"'/\2, }' \
+        -e '/^\[/ { s,^\(...[^|]\+|\)!\([^|]\+\),\1\2, }' \
+        -e '/^\[/ { s/\[//; s/^\(.\)|/\1/; s/\]//; s/|/\t/g }' \
+        -e 's/$/\r/' \
+        -- "$@"
 }
 
 isScript()
 {
-	# Any executable file "$1" with a name ending in ".$2" is meant to
-	# be a script.
+    # Any executable file "$1" with a name ending in ".$2" is meant to
+    # be a script.
 
-	[[ -x "$1" ]] && [[ "${1##*.}" == "$2" ]]
+    [[ -x "$1" ]] && [[ "${1##*.}" == "$2" ]]
 }
 
 matchesOnePattern()
 {
-	[[ -z "$2" ]] && return 1
+    [[ -z "$2" ]] && return 1
 
-	m=1
-	oifs=$IFS
-	IFS=:
-	for pattern in $2
-	do
-		[[ "$1" == $pattern ]] && m=0 && break
-	done
-	IFS=$oifs
+    m=1
+    oifs=$IFS
+    IFS=:
+    for pattern in $2; do
+        [[ "$1" == $pattern ]] && m=0 && break
+    done
+    IFS=$oifs
 
-	return $m
+    return $m
 }
 
 sendListing()
 {
-	if [[ -f "$1"/.HEADER ]]; then
-		parseIndex "${1:${#docroot}}" "$1"/.HEADER
-		printf 'i\t-\t-\t0\r\n'
-	fi
+    if [[ -f "$1"/.HEADER ]]; then
+        parseIndex "${1:${#docroot}}" "$1"/.HEADER
+        printf 'i\t-\t-\t0\r\n'
+    fi
 
-	# Read in additional patterns which shall be ignored.
-	[[ -f "$1"/.IGNORE ]] && ignore="$(<"$1"/.IGNORE)" || ignore=
-	shopt -u dotglob
+    # Read in additional patterns which shall be ignored.
+    [[ -f "$1"/.IGNORE ]] && ignore="$(<"$1"/.IGNORE)" || ignore=
+    shopt -u dotglob
 
-	# Auto-create a menu, try to guess file types.
-	for i in "$1"/*; do
-		# We strip all leading directory names from $i, because we want
-		# the user to be able to put "foo.txt" in a .IGNORE file and it
-		# will ignore exactly that file name. Without stripping, the
-		# user would have to use "*foo.txt".
-		matchesOnePattern "${i##*/}" "$ignore" && continue
+    # Auto-create a menu, try to guess file types.
+    for i in "$1"/*; do
+        # We strip all leading directory names from $i, because we want
+        # the user to be able to put "foo.txt" in a .IGNORE file and it
+        # will ignore exactly that file name. Without stripping, the
+        # user would have to use "*foo.txt".
+        matchesOnePattern "${i##*/}" "$ignore" && continue
 
-		# Skip non-existing files, including empty directories (in this
-		# case, "$1"/* will expand to "$1"/* which does not exist).
-		[[ -e "$i" ]] || continue
+        # Skip non-existing files, including empty directories (in this
+        # case, "$1"/* will expand to "$1"/* which does not exist).
+        [[ -e "$i" ]] || continue
 
-		# For each file, there may be a ".<filename>.ANN". This file
-		# shall be parsed and shown right before the menu item. As that
-		# file begins with a dot, it's not shown in the menu.
-		annfile="${i%/*}/.${i##*/}.ANN"
-		[[ -f "$annfile" ]] && parseIndex "${1:${#docroot}}" "$annfile"
+        # For each file, there may be a ".<filename>.ANN". This file
+        # shall be parsed and shown right before the menu item. As that
+        # file begins with a dot, it's not shown in the menu.
+        annfile="${i%/*}/.${i##*/}.ANN"
+        [[ -f "$annfile" ]] && parseIndex "${1:${#docroot}}" "$annfile"
 
-		if [[ -d "$i" ]]; then
-			itype=1
-		else
-			# The default type for files is 9, that is binary. If any of
-			# the following conditions matches, then $itype will get
-			# overwritten.
-			itype=9
-			if isScript "$i" "dcgi"; then
-				# As DCGI files are always piped into parseIndex(), they
-				# must be menus. However, if their name begins with
-				# "query_", then this script can receive search queries.
-				itype=1
-				bname=${i##*/}
-				bname=${bname,,}
-				if [[ "${bname:0:6}" == "query_" ]]; then
-					itype=7
-				fi
-			else
-				# Use file(1) to guess file type. Defaults to a binary
-				# file.
-				case "$(file -b -L --mime-type -- "$i")" in
-					application/x-gzip|application/x-xz|application/x-bzip2|\
-					application/zip) itype=5 ;;
-					audio/*|application/ogg) itype=s ;;
-					image/gif) itype=g ;;
-					image/*) itype=I ;;
-					text/html) itype=h ;;
-					text/*) itype=0 ;;
-					*) itype=9 ;;
-				esac
-			fi
-		fi
+        if [[ -d "$i" ]]; then
+            itype=1
+        else
+            # The default type for files is 9, that is binary. If any of
+            # the following conditions matches, then $itype will get
+            # overwritten.
+            itype=9
+            if isScript "$i" "dcgi"; then
+                # As DCGI files are always piped into parseIndex(), they
+                # must be menus. However, if their name begins with
+                # "query_", then this script can receive search queries.
+                itype=1
+                bname=${i##*/}
+                bname=${bname,,}
+                if [[ "${bname:0:6}" == "query_" ]]; then
+                    itype=7
+                fi
+            else
+                # Use file(1) to guess file type. Defaults to a binary
+                # file.
+                case "$(file -b -L --mime-type -- "$i")" in
+                    application/x-gzip|application/x-xz|application/x-bzip2|\
+                    application/zip) itype=5 ;;
+                    audio/*|application/ogg) itype=s ;;
+                    image/gif) itype=g ;;
+                    image/*) itype=I ;;
+                    text/html) itype=h ;;
+                    text/*) itype=0 ;;
+                    *) itype=9 ;;
+                esac
+            fi
+        fi
 
-		# Print this menu item, show the base name of $i.
-		printf "%s%s\t%s\t%s\t%d\r\n" \
-			$itype \
-			"${i##*/}" \
-			"${i:${#docroot}}" \
-			"$servername" \
-			"$serverport"
-	done
+        # Print this menu item, show the base name of $i.
+        printf "%s%s\t%s\t%s\t%d\r\n" \
+            $itype \
+            "${i##*/}" \
+            "${i:${#docroot}}" \
+            "$servername" \
+            "$serverport"
+    done
 }
 
 run()
 (
-	# Run a script. The working directory will be the script's location.
-	# Note the parentheses around this function: They'll start a
-	# subshell (and break syntax highlighting of Vim).
-	cd -- "${1%/*}"
-	"$@"
+    # Run a script. The working directory will be the script's location.
+    # Note the parentheses around this function: They'll start a
+    # subshell (and break syntax highlighting of Vim).
+    cd -- "${1%/*}"
+    "$@"
 )
 
 # --- Process a request.
@@ -161,43 +160,43 @@ search=${search%%$'\t'*}
 # impossible to request something like "/..".
 absreq=$(realpath -seq -- "$docroot$selector")
 if [[ "${absreq:0:${#docroot}}" == "$docroot" ]]; then
-	# In directories, try to find a file called .INDEX which may be a
-	# manually created menu. An .INDEX.dcgi script may be used to
-	# dynamically create a menu. Otherwise, we'll simply show the
-	# directories contents.
-	if [[ -d "$absreq" ]]; then
-		if [[ -f "$absreq"/.INDEX ]]; then
-			rtype="INDEX"
-			parseIndex "${absreq:${#docroot}}" "$absreq"/.INDEX
-		elif [[ -x "$absreq"/.INDEX.dcgi ]]; then
-			rtype="INDEX.dcgi"
-			run "$absreq"/.INDEX.dcgi | parseIndex "${absreq:${#docroot}}"
-		else
-			rtype="AUTOINDEX"
-			sendListing "$absreq"
-		fi
-	elif isScript "$absreq" "cgi"; then
-		rtype="CGI"
-		echo "$search" | run "$absreq"
-	elif isScript "$absreq" "dcgi"; then
-		# If a DCGI script outputs a relative path, then this path is
-		# meant to be relative to the scripts location.
-		rtype="DCGI"
-		rel="${absreq:${#docroot}}"
-		rel="${rel%/*}"
-		echo "$search" | run "$absreq" | parseIndex "$rel"
-	else
-		rtype="FILE"
-		# This is a regular file. Just show it.
-		cat "$absreq"
-	fi
+    # In directories, try to find a file called .INDEX which may be a
+    # manually created menu. An .INDEX.dcgi script may be used to
+    # dynamically create a menu. Otherwise, we'll simply show the
+    # directories contents.
+    if [[ -d "$absreq" ]]; then
+        if [[ -f "$absreq"/.INDEX ]]; then
+            rtype="INDEX"
+            parseIndex "${absreq:${#docroot}}" "$absreq"/.INDEX
+        elif [[ -x "$absreq"/.INDEX.dcgi ]]; then
+            rtype="INDEX.dcgi"
+            run "$absreq"/.INDEX.dcgi | parseIndex "${absreq:${#docroot}}"
+        else
+            rtype="AUTOINDEX"
+            sendListing "$absreq"
+        fi
+    elif isScript "$absreq" "cgi"; then
+        rtype="CGI"
+        echo "$search" | run "$absreq"
+    elif isScript "$absreq" "dcgi"; then
+        # If a DCGI script outputs a relative path, then this path is
+        # meant to be relative to the scripts location.
+        rtype="DCGI"
+        rel="${absreq:${#docroot}}"
+        rel="${rel%/*}"
+        echo "$search" | run "$absreq" | parseIndex "$rel"
+    else
+        rtype="FILE"
+        # This is a regular file. Just show it.
+        cat "$absreq"
+    fi
 
-	# Send informational message to syslog. This expects (x)inetd to
-	# fill the variable $REMOTE_HOST.
-	logger -it sgopherd -p daemon.info "'$REMOTE_HOST' '$rtype' '$request'"
+    # Send informational message to syslog. This expects (x)inetd to
+    # fill the variable $REMOTE_HOST.
+    logger -it sgopherd -p daemon.info "'$REMOTE_HOST' '$rtype' '$request'"
 else
-	# Log error condition and reply to client.
-	logger -it sgopherd -p daemon.error "'$REMOTE_HOST' 'INVALID' '$request'"
-	printf "%d%s\t%s\t%s\t%d\r\n" \
-		3 "\`$request' invalid." "Error" "Error" 0
+    # Log error condition and reply to client.
+    logger -it sgopherd -p daemon.error "'$REMOTE_HOST' 'INVALID' '$request'"
+    printf "%d%s\t%s\t%s\t%d\r\n" \
+        3 "\`$request' invalid." "Error" "Error" 0
 fi
