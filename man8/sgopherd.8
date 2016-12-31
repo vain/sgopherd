@@ -69,15 +69,15 @@ following could be used to integrate \fBsgopherd\fP into
 .P
 \f(CW
 .nf
-	service gopher
-	{
-		socket_type     = stream
-		wait            = no
-		user            = http
-		server          = /usr/bin/sgopherd
-		server_args     = -n myhostname -r /srv/gopher
-		disable         = no
-	}
+    service gopher
+    {
+        socket_type = stream
+        wait        = no
+        user        = http
+        server      = /usr/bin/sgopherd
+        server_args = -n myhostname -r /srv/gopher
+        disable     = no
+    }
 .fi
 \fP
 .P
@@ -100,12 +100,12 @@ look something like this:
 .P
 \f(CW
 .nf
-	[Socket]
-	ListenStream=70
-	Accept=yes
+    [Socket]
+    ListenStream=70
+    Accept=yes
 
-	[Install]
-	WantedBy=sockets.target
+    [Install]
+    WantedBy=sockets.target
 .fi
 \fP
 .P
@@ -113,15 +113,15 @@ look something like this:
 .P
 \f(CW
 .nf
-	[Unit]
-	Description=sgopherd per-connection server
+    [Unit]
+    Description=sgopherd per-connection server
 
-	[Service]
-	User=http
-	ExecStart=/usr/bin/sgopherd-systemd %i -n myhostname -r /srv/gopher
-	StandardInput=socket
-	StandardOutput=socket
-	StandardError=syslog
+    [Service]
+    User=http
+    ExecStart=/usr/bin/sgopherd-systemd %i -n myhostname -r /srv/gopher
+    StandardInput=socket
+    StandardOutput=socket
+    StandardError=syslog
 .fi
 \fP
 .P
@@ -130,16 +130,16 @@ in itself, doesn't do very much:
 .P
 \f(CW
 .nf
-	#!/bin/bash
+    #!/bin/bash
 
-	REMOTE_HOST=$1
-	shift
+    REMOTE_HOST=$1
+    shift
 
-	REMOTE_HOST=${REMOTE_HOST##*-}
-	REMOTE_HOST=${REMOTE_HOST%:*}
+    REMOTE_HOST=${REMOTE_HOST##*-}
+    REMOTE_HOST=${REMOTE_HOST%:*}
 
-	export REMOTE_HOST
-	exec sgopherd "$@"
+    export REMOTE_HOST
+    exec sgopherd "$@"
 .fi
 \fP
 .P
@@ -192,15 +192,15 @@ Thus, an index file could read as follows:
 .P
 \f(CW
 .nf
-	Welcome!
+    Welcome!
 
-	Have fun browsing this server.
+    Have fun browsing this server.
 
-	[0|About this server|about.txt|server|port]
-	[0|A quote|/random/quote.txt|server|port]
-	[1|Pics|/pics|server|port]
-	[1|My friend's server|foo.friend.org|70]
-	[h|Funny prank|!URL:http://www.microsoft.com|server|port]
+    [0|About this server|about.txt|server|port]
+    [0|A quote|/random/quote.txt|server|port]
+    [1|Pics|/pics|server|port]
+    [1|My friend's server|foo.friend.org|70]
+    [h|Funny prank|!URL:http://www.microsoft.com|server|port]
 .fi
 \fP
 .P
@@ -238,7 +238,7 @@ contained the following line, then all files ending in \(lq.groff\(rq or
 .P
 \f(CW
 .nf
-	*.groff:*.log
+    *.groff:*.log
 .fi
 \fP
 .P
