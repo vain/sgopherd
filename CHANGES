@@ -1,6 +1,6 @@
 Release history for sgopherd
 
-next
+v17.02  2017-02-12
   [Fixed]
   - .IGNORE files work again. They used to internally set $GLOBIGNORE,
     which appears to have changed its behaviour. We now manually test
