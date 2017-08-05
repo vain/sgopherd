@@ -1,5 +1,11 @@
 Release history for sgopherd
 
+next
+  [Changed]
+  - When using systemd, we now expect it to set the environment variable
+    $REMOTE_ADDR, which happens since systemd 220. The systemd-specific
+    wrapper script has been removed.
+
 v17.02  2017-02-12
   [Fixed]
   - .IGNORE files work again. They used to internally set $GLOBIGNORE,

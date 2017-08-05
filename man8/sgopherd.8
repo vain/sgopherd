@@ -87,14 +87,8 @@ port for the gopher service), then \fBsgopherd\fP will be executed.
 Remember to set \fBdisable = no\fP if you wish to run \fBsgopherd\fP.
 .SH "CONFIGURATION \(em SYSTEMD"
 If you don't like (x)inetd anymore, it's also possible to use systemd's
-socket activation to run \fBsgopherd\fP. In contrast to inetd, systemd
-does not set any environment variables which contain information about
-the remote host. \fBsgopherd\fP wants to write that information to
-syslog, though. It's up to you: Either you use a little wrapper script
-or you ignore this issue.
-.P
-\fIsgopherd.socket\fP and \fIsgopherd@.service\fP are provided. They
-look something like this:
+socket activation to run \fBsgopherd\fP. \fIsgopherd.socket\fP and
+\fIsgopherd@.service\fP are provided. They look something like this:
 .P
 \fIsgopherd.socket\fP:
 .P
@@ -118,35 +112,12 @@ look something like this:
 
     [Service]
     User=http
-    ExecStart=/usr/bin/sgopherd-systemd %i -n myhostname -r /srv/gopher
+    ExecStart=/usr/bin/sgopherd -n myhostname -r /srv/gopher
     StandardInput=socket
     StandardOutput=socket
     StandardError=syslog
 .fi
 \fP
-.P
-Those files make use of the wrapper script \fIsgopherd-systemd\fP which,
-in itself, doesn't do very much:
-.P
-\f(CW
-.nf
-    #!/bin/bash
-
-    REMOTE_HOST=$1
-    shift
-
-    REMOTE_HOST=${REMOTE_HOST##*-}
-    REMOTE_HOST=${REMOTE_HOST%:*}
-
-    export REMOTE_HOST
-    exec sgopherd "$@"
-.fi
-\fP
-.P
-You may have noticed that we use the template form here. The \fB%i\fP
-gets replaced with information about the remote host and the wrapper
-scripts transforms this argument into something that's usable by
-\fBsgopherd\fP.
 .P
 You should place \fIsgopherd@.service\fP in \fI/etc/systemd/system\fP
 instead of \fI/usr/lib/systemd/system\fP because you'll most likely want
@@ -281,9 +252,8 @@ Where:
 or systemd.
 .IP \(bu 4
 \fI<host>\fP is the IP of the remote host. (x)inetd is expected to fill
-the environment variable $\fBREMOTE_HOST\fP when launching
-\fBsgopherd\fP. When using systemd, the wrapper script
-(\fBsgopherd-systemd\fP) takes care of this.
+the environment variable $\fBREMOTE_HOST\fP and systemd is expected to
+fill $\fBREMOTE_ADDR\fP.
 .IP \(bu 4
 \fI<type>\fP shows the type of the served ressource, such as
 \fBINDEX\fP, \fBINDEX.dcgi\fP, \fBAUTOINDEX\fP, \fBCGI\fP, \fBDCGI\fP or

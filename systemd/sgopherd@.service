@@ -3,7 +3,7 @@ Description=sgopherd per-connection server
 
 [Service]
 User=http
-ExecStart=/usr/bin/sgopherd-systemd %i -n myhostname -r /srv/gopher
+ExecStart=/usr/bin/sgopherd -n myhostname -r /srv/gopher
 StandardInput=socket
 StandardOutput=socket
 StandardError=syslog

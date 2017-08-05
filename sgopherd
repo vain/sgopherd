@@ -154,6 +154,10 @@ selector=${request%%$'\t'*}
 search=${request:${#selector}+1}
 search=${search%%$'\t'*}
 
+# Who's our peer? Use (x)inetd-style $REMOTE_HOST or systemd-style
+# $REMOTE_ADDR.
+[[ -n "$REMOTE_ADDR" ]] && export REMOTE_HOST="$REMOTE_ADDR"
+
 # Prefix the selector with the path of the document root. Then convert
 # this path into an absolute one. If the result is still a path below
 # $docroot, then it's okay to proceed. Hence, this routine makes it
@@ -191,12 +195,11 @@ if [[ "${absreq:0:${#docroot}}" == "$docroot" ]]; then
         cat "$absreq"
     fi
 
-    # Send informational message to syslog. This expects (x)inetd to
-    # fill the variable $REMOTE_HOST.
-    logger -it sgopherd -p daemon.info "'$REMOTE_HOST' '$rtype' '$request'"
+    # Send informational message to syslog.
+    logger -it sgopherd -p daemon.info "'$remote_peer' '$rtype' '$request'"
 else
     # Log error condition and reply to client.
-    logger -it sgopherd -p daemon.error "'$REMOTE_HOST' 'INVALID' '$request'"
+    logger -it sgopherd -p daemon.error "'$remote_peer' 'INVALID' '$request'"
     printf "%d%s\t%s\t%s\t%d\r\n" \
         3 "\`$request' invalid." "Error" "Error" 0
 fi
