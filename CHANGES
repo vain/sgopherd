@@ -1,6 +1,11 @@
 Release history for sgopherd
 
 next
+  [LICENSING]
+  - The project has been relicensed under the MIT license (more
+    precisely called "Expat License", but everyone calls it "MIT
+    license" these days).
+
   [Changed]
   - When using systemd, we now expect it to set the environment variable
     $REMOTE_ADDR, which happens since systemd 220. The systemd-specific
