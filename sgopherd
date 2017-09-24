@@ -212,10 +212,10 @@ if [[ "${absreq:0:${#docroot}}" == "$docroot" ]]; then
     fi
 
     # Send informational message to syslog.
-    logger -it sgopherd -p daemon.info "'$remote_peer' '$rtype' '$request'"
+    logger -it sgopherd -p daemon.info "'$REMOTE_HOST' '$rtype' '$request'"
 else
     # Log error condition and reply to client.
-    logger -it sgopherd -p daemon.error "'$remote_peer' 'INVALID' '$request'"
+    logger -it sgopherd -p daemon.error "'$REMOTE_HOST' 'INVALID' '$request'"
     printf "%d%s\t%s\t%s\t%d\r\n" \
         3 "\`$request' invalid." "Error" "Error" 0
 fi
