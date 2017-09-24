@@ -171,8 +171,17 @@ search=${request:${#selector}+1}
 search=${search%%$'\t'*}
 
 # Who's our peer? Use (x)inetd-style $REMOTE_HOST or systemd-style
-# $REMOTE_ADDR.
-[[ -n "$REMOTE_ADDR" ]] && export REMOTE_HOST="$REMOTE_ADDR"
+# $REMOTE_ADDR. If we still don't know it, try OpenBSD's fstat (you're
+# then probably using sgopherd on OpenBSD using traditional inetd, which
+# does not provide any environment variables).
+[[ -n "$REMOTE_ADDR" ]] && REMOTE_HOST="$REMOTE_ADDR"
+if [[ -z "$REMOTE_HOST" ]] && which fstat >/dev/null 2>&1
+then
+    REMOTE_HOST=$(fstat -p $$ | awk '$4 == "0*" { print $9 }')
+    REMOTE_HOST=${REMOTE_HOST%:*}
+fi
+REMOTE_HOST=${REMOTE_HOST:-UNKNOWN}
+export REMOTE_HOST
 
 # Prefix the selector with the path of the document root. Then convert
 # this path into an absolute one. If the result is still a path below
