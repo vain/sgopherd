@@ -1,4 +1,4 @@
-.TH SGOPHERD 8 "September 2017" "sgopherd" "Small Gopher Daemon"
+.TH SGOPHERD 8 "2017-09-24" "sgopherd" "Small Gopher Daemon"
 .SH NAME
 sgopherd \- a small gopher server written in
 .BR bash (1)
@@ -222,7 +222,8 @@ output on \fBstdout\fP is sent to the client. If a search string was
 supplied, then this string is written to the script's \fBstdin\fP. The
 script's working directory is the same as its location.
 .P
-Note: There are no environment variables provided to the script, yet.
+CGI scripts have $\fBREMOTE_HOST\fP available in their environment. It
+contains the IP address of the current client.
 .SS "DCGI scripts"
 Pretty much the same as CGI scripts but the file name must end with
 \(lq.dcgi\(rq. Furthermore, the script's output will be interpreted
@@ -251,9 +252,10 @@ Where:
 \fI<pid>\fP is the process ID of the shell script as invoked by (x)inetd
 or systemd.
 .IP \(bu 4
-\fI<host>\fP is the IP of the remote host. (x)inetd is expected to fill
+\fI<host>\fP is the IP of the remote host. xinetd is expected to fill
 the environment variable $\fBREMOTE_HOST\fP and systemd is expected to
-fill $\fBREMOTE_ADDR\fP.
+fill $\fBREMOTE_ADDR\fP. If you're on OpenBSD using traditional inet,
+\fBsgopherd\fP tries to find the remote address using \fBfstat\fP(1).
 .IP \(bu 4
 \fI<type>\fP shows the type of the served ressource, such as
 \fBINDEX\fP, \fBINDEX.dcgi\fP, \fBAUTOINDEX\fP, \fBCGI\fP, \fBDCGI\fP or
@@ -290,13 +292,6 @@ tracker at \fIhttps://github.com/vain/sgopherd\fP or send an e-mail to
 \fIpcode@uninformativ.de\fP. If that doesn't work, then you should find
 up to date contact information at \fIhttp://uninformativ.de\fP or
 \fIgopher://uninformativ.de\fP.
-.P
-Currently, \fBsgopherd\fP requires GNU \fBbash\fP(1) and GNU
-\fBsed\fP(1). This means that it won't run on non-GNU systems such as
-the BSD family \(en unless you install those GNU programs.  Porting
-\fBsgopherd\fP to POSIX \fBsh\fP(1p) will most likely result in a
-complete rewrite. Porting it to POSIX \fBsed\fP(1p), however, should not
-be that hard.
 .P
 The RFC requires that, in some circumstances, a line containing only one
 single dot is sent. For example, gopher menus must end with such a line.
