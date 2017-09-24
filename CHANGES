@@ -1,5 +1,12 @@
 Release history for sgopherd
 
+next
+  [Fixed]
+  - Logging of remote addresses has been fixed.
+
+  [Added]
+  - Compatibility with OpenBSD 6.1.
+
 v17.09  2017-09-09
   [LICENSING]
   - The project has been relicensed under the MIT license (more
