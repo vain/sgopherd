@@ -4,7 +4,7 @@
 
 
 sgopherd is a simple gopher server for Unix-like systems, preferably
-GNU.
+GNU or OpenBSD.
 
 
 Installation
@@ -13,10 +13,10 @@ Installation
 As sgopherd is a Bash script, there is no build process. However, the
 program relies on several external utilities:
 
-    - GNU sed
-    - GNU file
+    - GNU sed or OpenBSD sed
+    - GNU file or OpenBSD file
     - logger (usually part of util-linux)
-    - xinetd or systemd
+    - (x)inetd or systemd
 
 If you're on Arch Linux, you can use the following AUR package:
 
