@@ -14,6 +14,18 @@ while getopts n:p:r: name; do
 done
 
 # --- Library functions.
+rel2abs()
+{
+    # Convert a relative path into an absolute one. Do NOT use readlink
+    # because that would break support for symbolic links which point
+    # outside the document root. Instead, temporarily change into the
+    # directory, then print the current directory. This way, the kernel
+    # resolves relative paths.
+
+    [[ -d "$1" ]] && { (cd -- "$1"; echo "$PWD"); return; }
+    [[ -f "$1" ]] && { (cd -- "${1%/*}"; echo "$PWD/${1##*/}"); return; }
+}
+
 parseIndex()
 {
     # Parse an index file. The syntax is similar to the one of geomyidae
@@ -162,7 +174,7 @@ search=${search%%$'\t'*}
 # this path into an absolute one. If the result is still a path below
 # $docroot, then it's okay to proceed. Hence, this routine makes it
 # impossible to request something like "/..".
-absreq=$(realpath -seq -- "$docroot$selector")
+absreq=$(rel2abs "$docroot$selector")
 if [[ "${absreq:0:${#docroot}}" == "$docroot" ]]; then
     # In directories, try to find a file called .INDEX which may be a
     # manually created menu. An .INDEX.dcgi script may be used to
