@@ -38,18 +38,22 @@ parseIndex()
     # remove that "!" and leave the path as is.
     #
     # Read from STDIN if $@ is empty.
+    #
+    # Note that we have to use literal tabs here instead of "\t" and a
+    # literal CR instead of "\r", because not all versions of sed
+    # understand those escape sequences.
 
     rel=$1
     shift
 
-    sed \
-        -e '/^\[/! { s/.*/i&\t-\t-\t0/ }' \
-        -e '/^\[/ { s/\(.*\)|server|\([^|]\+\)]/\1|'"$servername"'|\2]/ }' \
-        -e '/^\[/ { s/\(.*\)|\([^|]\+\)|port]/\1|\2|'"$serverport"']/ }' \
-        -e '/^\[/ { s,^\(...[^|]\+|\)\([^/!]\),\1'"$rel"'/\2, }' \
-        -e '/^\[/ { s,^\(...[^|]\+|\)!\([^|]\+\),\1\2, }' \
-        -e '/^\[/ { s/\[//; s/^\(.\)|/\1/; s/\]//; s/|/\t/g }' \
-        -e 's/$/\r/' \
+    sed -r \
+        -e '/^\[/! { s/.*/i&	-	-	0/; }' \
+        -e '/^\[/ { s/(.*)\|server\|([^|]+)]/\1|'"$servername"'|\2]/; }' \
+        -e '/^\[/ { s/(.*)\|([^|]+)\|port]/\1|\2|'"$serverport"']/; }' \
+        -e '/^\[/ { s,^(...[^|]+\|)([^/!]),\1'"$rel"'/\2,; }' \
+        -e '/^\[/ { s,^(...[^|]+\|)!([^|]+),\1\2,; }' \
+        -e '/^\[/ { s/\[//; s/^(.)\|/\1/; s/\]//; s/\|/	/g; }' \
+        -e 's/$//' \
         -- "$@"
 }
 
