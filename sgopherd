@@ -177,7 +177,7 @@ search=${search%%$'\t'*}
 [[ -n "$REMOTE_ADDR" ]] && REMOTE_HOST="$REMOTE_ADDR"
 if [[ -z "$REMOTE_HOST" ]] && which fstat >/dev/null 2>&1
 then
-    REMOTE_HOST=$(fstat -p $$ | awk '$4 == "0*" { print $9 }')
+    REMOTE_HOST=$(fstat -p $$ | awk '$4 == "0*" { print $11 }')
     REMOTE_HOST=${REMOTE_HOST%:*}
 fi
 REMOTE_HOST=${REMOTE_HOST:-UNKNOWN}
