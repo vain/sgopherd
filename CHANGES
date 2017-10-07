@@ -1,6 +1,6 @@
 Release history for sgopherd
 
-next
+v17.10  2017-10-07
   [Fixed]
   - Logging of remote addresses has been fixed.
 
