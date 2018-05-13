@@ -4,9 +4,11 @@
 servername="localhost"
 serverport="70"
 docroot=/srv/gopher
+logremoteip=no
 
-while getopts n:p:r: name; do
+while getopts l:n:p:r: name; do
     case $name in
+        l) logremoteip=yes ;;
         n) servername="$OPTARG" ;;
         p) serverport="$OPTARG" ;;
         r) docroot="$OPTARG" ;;
@@ -183,6 +185,8 @@ fi
 REMOTE_HOST=${REMOTE_HOST:-UNKNOWN}
 export REMOTE_HOST
 
+[[ "$logremoteip" == "yes" ]] && remote_log=$REMOTE_HOST || remote_log='<anon>'
+
 # Prefix the selector with the path of the document root. Then convert
 # this path into an absolute one. If the result is still a path below
 # $docroot, then it's okay to proceed. Hence, this routine makes it
@@ -221,10 +225,10 @@ if [[ "${absreq:0:${#docroot}}" == "$docroot" ]]; then
     fi
 
     # Send informational message to syslog.
-    logger -it sgopherd -p daemon.info "'$REMOTE_HOST' '$rtype' '$request'"
+    logger -it sgopherd -p daemon.info "'$remote_log' '$rtype' '$request'"
 else
     # Log error condition and reply to client.
-    logger -it sgopherd -p daemon.error "'$REMOTE_HOST' 'INVALID' '$request'"
+    logger -it sgopherd -p daemon.error "'$remote_log' 'INVALID' '$request'"
     printf "%d%s\t%s\t%s\t%d\r\n" \
         3 "\`$request' invalid." "Error" "Error" 0
 fi

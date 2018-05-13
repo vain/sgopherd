@@ -1,5 +1,10 @@
 Release history for sgopherd
 
+next
+  [Changed]
+  - Logging of remote addresses is now disabled by default. If needed,
+    can be enabled again with "-l".
+
 v17.10  2017-10-07
   [Fixed]
   - Logging of remote addresses has been fixed.

@@ -4,6 +4,7 @@ sgopherd \- a small gopher server written in
 .BR bash (1)
 .SH SYNOPSIS
 \fBsgopherd\fP
+[\fB\-l\fP]
 [\fB\-n\fP \fIname\fP]
 [\fB\-p\fP \fIport\fP]
 [\fB\-r\fP \fIdocroot\fP]
@@ -42,6 +43,11 @@ Not counting commented lines, \fBsgopherd\fP tries not to exceed 100
 lines of code (with a tolerance of some lines). The script should be
 easy to read and easy to understand.
 .SH OPTIONS
+.TP
+\fB\-l\fP
+Enable logging of IP addresses of remote hosts. (Be aware that something
+like \fBxinetd\fP or \fBsystemd\fP might still log remote addresses, so
+you have to configure these daemons, too.)
 .TP
 \fB\-n\fP \fIname\fP
 The server's hostname. This string will be used in menu items. This
