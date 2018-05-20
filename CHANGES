@@ -1,6 +1,6 @@
 Release history for sgopherd
 
-next
+v18.05  2018-05-20
   [Changed]
   - Logging of remote addresses is now disabled by default. If needed,
     can be enabled again with "-l".
